@@ -1,9 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Reflection;
 using System.Windows;
-using Depattach.Fody;
-using Mono.Cecil;
 using NUnit.Framework;
 
 namespace Depattach.Test.Dependency
@@ -11,32 +8,18 @@ namespace Depattach.Test.Dependency
 	[TestFixture]
 	public class PropertyAttributeTests
 	{
-		private ModuleDefinition _module;
-		private MemoryStream _stream;
+		private Assembly _assembly;
 
 		[OneTimeSetUp]
 		public void Setup()
 		{
-			_stream = new MemoryStream();
-			_module = ModuleDefinition.ReadModule("AssemblyDependencyProperty.dll");
-
-			ModuleWeaver weavingTask = new ModuleWeaver
-			{
-				ModuleDefinition = _module
-			};
-
-			weavingTask.Execute();
-
-			_module.Write(_stream);
-			_stream.Seek(0, SeekOrigin.Begin);
+			_assembly = Weaver.Weave(Weaver.DependencyProperty);
 		}
 
 		[Test]
 		public void ValidateConversionToDependencyPropertyReferenceType()
 		{
-			Assembly assembly = Assembly.Load(_stream.ToArray());
-
-			Type type = assembly.GetType(nameof(PropertyAttribute));
+			Type type = _assembly.GetType(nameof(PropertyAttribute));
 
 			DependencyProperty referenceProperty = (DependencyProperty)type.GetField($"{nameof(PropertyAttribute.Reference)}Property").GetValue(null);
 
@@ -54,9 +37,7 @@ namespace Depattach.Test.Dependency
 		[Test]
 		public void ValidateConversionToDependencyPropertyValueType()
 		{
-			Assembly assembly = Assembly.Load(_stream.ToArray());
-
-			Type type = assembly.GetType(nameof(PropertyAttribute));
+			Type type = _assembly.GetType(nameof(PropertyAttribute));
 
 			DependencyProperty valueProperty = (DependencyProperty)type.GetField($"{nameof(PropertyAttribute.Value)}Property").GetValue(null);
 
@@ -69,12 +50,6 @@ namespace Depattach.Test.Dependency
 			instance.SetValue(valueProperty, 2);
 			Assert.AreEqual(2, instance.Value);
 			Assert.AreEqual(2, instance.GetValue(valueProperty));
-		}
-
-		[OneTimeTearDown]
-		public void Cleanup()
-		{
-			_stream?.Dispose();
 		}
 	}
 }

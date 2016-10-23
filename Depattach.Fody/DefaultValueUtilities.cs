@@ -24,33 +24,16 @@ namespace Depattach.Fody
 			return variable;
 		}
 
-		public static void AddInstrunctionForDefaultValue(this List<Instruction> instructions, bool defaultValue, ModuleDefinition moduleDefinition)
+		public static Dictionary<PropertyDefinition, List<Instruction>> InterceptDefaultValuesInConstructor(this TypeDefinition typeDefinition)
 		{
-			instructions.Add(Instruction.Create(OpCodes.Ldc_I4, defaultValue ? 1 : 0));
-			instructions.Add(Instruction.Create(OpCodes.Box, moduleDefinition.TypeSystem.Boolean));
-		}
+			Dictionary<PropertyDefinition, List<Instruction>> results = new Dictionary<PropertyDefinition, List<Instruction>>();
 
-		public static void AddInstrunctionForDefaultValue(this List<Instruction> instructions, byte defaultValue, ModuleDefinition moduleDefinition)
-		{
-			instructions.Add(Instruction.Create(OpCodes.Ldc_I4, defaultValue));
-			instructions.Add(Instruction.Create(OpCodes.Box, moduleDefinition.TypeSystem.Byte));
-		}
+			foreach (PropertyDefinition propertyDefinition in typeDefinition.Properties)
+			{
+				
+			}
 
-		public static void AddInstrunctionForDefaultValue(this List<Instruction> instructions, short defaultValue, ModuleDefinition moduleDefinition)
-		{
-			instructions.Add(Instruction.Create(OpCodes.Ldc_I4, defaultValue));
-			instructions.Add(Instruction.Create(OpCodes.Box, moduleDefinition.TypeSystem.Int16));
-		}
-
-		public static void AddInstrunctionForDefaultValue(this List<Instruction> instructions, int defaultValue, ModuleDefinition moduleDefinition)
-		{
-			instructions.Add(Instruction.Create(OpCodes.Ldc_I4, defaultValue));
-			instructions.Add(Instruction.Create(OpCodes.Box, moduleDefinition.TypeSystem.Int32));
-		}
-
-		public static void AddInstrunctionForDefaultValue(this List<Instruction> instructions, string defaultValue)
-		{
-			instructions.Add(Instruction.Create(OpCodes.Ldstr, defaultValue));
+			return results;
 		}
 	}
 }

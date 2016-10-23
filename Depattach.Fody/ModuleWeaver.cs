@@ -41,13 +41,20 @@ namespace Depattach.Fody
 
 			foreach (TypeDefinition typeDefinition in ModuleDefinition.Types)
 			{
+				List<PropertyDefinition> propertiesToConvert = new List<PropertyDefinition>();
+
 				foreach (PropertyDefinition propertyDefinition in typeDefinition.Properties)
 				{
-					if (!propertyDefinition.CanConvertToDependencyProperty(typeDefinition))
+					if (!propertyDefinition.ShouldConvertToDependencyProperty(typeDefinition))
 					{
 						continue;
 					}
 
+					propertiesToConvert.Add(propertyDefinition);
+				}
+
+				foreach (PropertyDefinition propertyDefinition in propertiesToConvert)
+				{
 					propertyDefinition.ValidateBeforeConversion(typeDefinition);
 					typeDefinition.ValidateBeforeConversion(_dependencyObjectTypeReference);
 
@@ -71,9 +78,7 @@ namespace Depattach.Fody
 			string fieldName = propertyDefinition.Name + "Property";
 			FieldDefinition fieldDefinition = new FieldDefinition(fieldName, FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.Public, _dependencyObjectTypeReference);
 
-			object defaultValue = null;// propertyDefinition.GetDependencyPropertyAttribute()?.GetDefaultValueFromAttribute();
-
-			AddInitializationToStaticConstructor(typeDefinition, propertyDefinition, fieldDefinition, defaultValue);
+			AddInitializationToStaticConstructor(typeDefinition, propertyDefinition, fieldDefinition);
 
 			typeDefinition.Fields.Add(fieldDefinition);
 
@@ -83,7 +88,7 @@ namespace Depattach.Fody
 			typeDefinition.Fields.Remove(backingField);
 		}
 
-		private void AddInitializationToStaticConstructor(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition, FieldDefinition fieldDefinition, object defaultValue)
+		private void AddInitializationToStaticConstructor(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition, FieldDefinition fieldDefinition)
 		{
 			MethodDefinition staticConstructor = typeDefinition.GetStaticConstructor();
 

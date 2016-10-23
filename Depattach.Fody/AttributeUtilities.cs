@@ -22,7 +22,7 @@ namespace Depattach.Fody
 			}
 		}
 
-		public static bool CanConvertToDependencyProperty(this PropertyDefinition propertyDefinition, TypeDefinition typeDefinition)
+		public static bool ShouldConvertToDependencyProperty(this PropertyDefinition propertyDefinition, TypeDefinition typeDefinition)
 		{
 			CustomAttribute typeAttribute = typeDefinition.GetDependencyPropertyAttribute();
 			CustomAttribute propertyAttribute = propertyDefinition.GetDependencyPropertyAttribute();

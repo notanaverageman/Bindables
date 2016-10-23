@@ -52,35 +52,7 @@ namespace Depattach.Fody
 			TypeReference typeReference = moduleDefinition.ImportReference(type);
 			IEnumerable<MethodReference> constructors = typeReference.Resolve().GetConstructors();
 
-			foreach (MethodReference constructor in constructors)
-			{
-				Collection<ParameterDefinition> parameters = constructor.Parameters;
-
-				if (parameters.Count != parameterTypes.Length)
-				{
-					continue;
-				}
-
-				bool allSame = true;
-
-				for (int i = 0; i < parameters.Count; i++)
-				{
-					ParameterDefinition parameter = parameters[i];
-					Type parameterType = parameterTypes[i];
-
-					if (parameter.ParameterType.FullName != parameterType.FullName)
-					{
-						allSame = false;
-					}
-				}
-
-				if (allSame)
-				{
-					return moduleDefinition.ImportReference(constructor);
-				}
-			}
-
-			throw new ArgumentException("No constructors found.");
+			return GetMethodReference(moduleDefinition, constructors, parameterTypes);
 		}
 
 		public static MethodReference ImportMethod(this ModuleDefinition moduleDefinition, Type type, string methodName, params Type[] parameterTypes)
@@ -88,6 +60,11 @@ namespace Depattach.Fody
 			TypeReference typeReference = moduleDefinition.ImportReference(type);
 			IEnumerable<MethodReference> methods = typeReference.Resolve().Methods.Where(m => m.Name == methodName);
 
+			return GetMethodReference(moduleDefinition, methods, parameterTypes);
+		}
+
+		private static MethodReference GetMethodReference(ModuleDefinition moduleDefinition, IEnumerable<MethodReference> methods, Type[] parameterTypes)
+		{
 			foreach (MethodReference methodReference in methods)
 			{
 				Collection<ParameterDefinition> parameters = methodReference.Parameters;
