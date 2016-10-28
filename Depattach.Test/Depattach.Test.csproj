@@ -81,6 +81,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AssemblyDependencyProperty.DefaultValue\AssemblyDependencyProperty.DefaultValue.csproj">
+      <Project>{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84}</Project>
+      <Name>AssemblyDependencyProperty.DefaultValue</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AssemblyDependencyProperty.NonAutoProperty\AssemblyDependencyProperty.NonAutoProperty.csproj">
       <Project>{90a14e57-2c6a-429f-bb44-066af047e7f2}</Project>
       <Name>AssemblyDependencyProperty.NonAutoProperty</Name>

@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty.ReadOnlyProperty", "AssemblyDependencyProperty.ReadOnlyProperty\AssemblyDependencyProperty.ReadOnlyProperty.csproj", "{E51CA02B-2D21-4B4C-BA6A-38BA4B27BC94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty.DefaultValue", "AssemblyDependencyProperty.DefaultValue\AssemblyDependencyProperty.DefaultValue.csproj", "{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{E51CA02B-2D21-4B4C-BA6A-38BA4B27BC94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E51CA02B-2D21-4B4C-BA6A-38BA4B27BC94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E51CA02B-2D21-4B4C-BA6A-38BA4B27BC94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,5 +61,6 @@ Global
 		{F6FEF774-4FB4-45DB-9D63-12A325907C7A} = {6D0FBE51-0C5F-45E5-BAE0-FA26F3550425}
 		{90A14E57-2C6A-429F-BB44-066AF047E7F2} = {6D0FBE51-0C5F-45E5-BAE0-FA26F3550425}
 		{E51CA02B-2D21-4B4C-BA6A-38BA4B27BC94} = {6D0FBE51-0C5F-45E5-BAE0-FA26F3550425}
+		{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84} = {6D0FBE51-0C5F-45E5-BAE0-FA26F3550425}
 	EndGlobalSection
 EndGlobal

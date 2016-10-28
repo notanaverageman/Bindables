@@ -53,32 +53,41 @@ namespace Depattach.Fody
 					propertiesToConvert.Add(propertyDefinition);
 				}
 
+				if (!propertiesToConvert.Any())
+				{
+					continue;
+				}
+
+				typeDefinition.CreateStaticConstructorIfNotExists();
+
+				Dictionary<PropertyDefinition, Range> instructionRanges = typeDefinition.InterpretDefaultValues(propertiesToConvert);
+				
 				foreach (PropertyDefinition propertyDefinition in propertiesToConvert)
 				{
 					propertyDefinition.ValidateBeforeConversion(typeDefinition);
 					typeDefinition.ValidateBeforeConversion(_dependencyObjectTypeReference);
 
-					typeDefinition.CreateStaticConstructorIfNotExists();
-
-					ConvertToDependencyProperty(typeDefinition, propertyDefinition);
+					Range range = instructionRanges[propertyDefinition];
+					ConvertToDependencyProperty(typeDefinition, propertyDefinition, range);
 
 					propertyDefinition.RemoveDependencyPropertyAttribute();
 				}
 
+				typeDefinition.RemoveInitializationInstructionsFromAllConstructors(instructionRanges);
 				typeDefinition.RemoveDependencyPropertyAttribute();
 			}
 
 			ModuleDefinition.AssemblyReferences.Remove(dependencyPropertyAssemblyNameReference);
 		}
 
-		private void ConvertToDependencyProperty(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition)
+		private void ConvertToDependencyProperty(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition, Range range)
 		{
 			FieldDefinition backingField = typeDefinition.GetBackingFieldForProperty(propertyDefinition);
 
 			string fieldName = propertyDefinition.Name + "Property";
 			FieldDefinition fieldDefinition = new FieldDefinition(fieldName, FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.Public, _dependencyObjectTypeReference);
 
-			AddInitializationToStaticConstructor(typeDefinition, propertyDefinition, fieldDefinition);
+			AddInitializationToStaticConstructor(typeDefinition, propertyDefinition, fieldDefinition, range);
 
 			typeDefinition.Fields.Add(fieldDefinition);
 
@@ -88,7 +97,7 @@ namespace Depattach.Fody
 			typeDefinition.Fields.Remove(backingField);
 		}
 
-		private void AddInitializationToStaticConstructor(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition, FieldDefinition fieldDefinition)
+		private void AddInitializationToStaticConstructor(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition, FieldDefinition fieldDefinition, Range range)
 		{
 			MethodDefinition staticConstructor = typeDefinition.GetStaticConstructor();
 
@@ -101,32 +110,7 @@ namespace Depattach.Fody
 				Instruction.Create(OpCodes.Call, _getTypeFromHandleMethodReference)
 			};
 
-			//if (defaultValue != null)
-			//{
-			//	Type type = defaultValue.GetType();
-			//	if (type == typeof(string))
-			//	{
-			//		instructions.AddInstrunctionForDefaultValue((string)defaultValue);
-			//	}
-			//	else if (type == typeof(int))
-			//	{
-			//		instructions.AddInstrunctionForDefaultValue((int)defaultValue, ModuleDefinition);
-			//	}
-			//	else if (type == typeof(bool))
-			//	{
-			//		instructions.AddInstrunctionForDefaultValue((bool)defaultValue, ModuleDefinition);
-			//	}
-			//}
-			//else
-			//{
-			VariableDefinition variable = instructions.AddInstrunctionForDefaultValue(propertyDefinition);
-
-			if (variable != null)
-			{
-				staticConstructor.Body.InitLocals = true;
-				staticConstructor.Body.Variables.Add(variable);
-			}
-			//}
+			instructions.AppendDefaultValueInstructions(typeDefinition, propertyDefinition, range);
 
 			instructions.Add(Instruction.Create(OpCodes.Newobj, _frameworkPropertyMetadataConstructor));
 

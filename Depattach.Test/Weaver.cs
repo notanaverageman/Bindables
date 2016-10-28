@@ -8,8 +8,7 @@ namespace Depattach.Test
 	public class Weaver
 	{
 		public const string DependencyProperty = "AssemblyDependencyProperty.dll";
-		public const string DependencyPropertyNonAutoProperty = "AssemblyDependencyProperty.NonAutoProperty.dll";
-		public const string DependencyPropertyReadOnlyProperty = "AssemblyDependencyProperty.ReadOnlyProperty.dll";
+		public const string DependencyPropertyDefaultValue = "AssemblyDependencyProperty.DefaultValue.dll";
 
 		public static Assembly Weave(string assemblyName)
 		{
@@ -26,6 +25,8 @@ namespace Depattach.Test
 
 				module.Write(stream);
 				stream.Seek(0, SeekOrigin.Begin);
+
+				module.Write(@"C:\Users\Yusuf\Desktop\Test.dll");
 
 				return Assembly.Load(stream.ToArray());
 			}
