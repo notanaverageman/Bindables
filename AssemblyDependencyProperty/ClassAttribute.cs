@@ -15,8 +15,7 @@ public class ClassAttribute : DependencyObject
 		get { return _nonAuto; }
 		set { _nonAuto = value; }
 	}
-
-	public string Readonly { get; }
+	
 	public string Reference { get; set; }
 	public int Value { get; set; }
 }

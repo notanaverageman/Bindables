@@ -72,7 +72,7 @@
     <Compile Include="Dependency\ClassAttributeTests.cs" />
     <Compile Include="Dependency\DefaultValueTests.cs" />
     <Compile Include="Dependency\PropertyAttributeTests.cs" />
-    <Compile Include="Dependency\PropertyAttributeTests.ReadOnly.cs" />
+    <Compile Include="Dependency\ReadOnlyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Weaver.cs" />
   </ItemGroup>
@@ -89,9 +89,9 @@
       <Project>{90a14e57-2c6a-429f-bb44-066af047e7f2}</Project>
       <Name>AssemblyDependencyProperty.NonAutoProperty</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AssemblyDependencyProperty.ReadOnlyProperty\AssemblyDependencyProperty.ReadOnlyProperty.csproj">
+    <ProjectReference Include="..\AssemblyDependencyProperty.ReadOnly\AssemblyDependencyProperty.ReadOnly.csproj">
       <Project>{e51ca02b-2d21-4b4c-ba6a-38ba4b27bc94}</Project>
-      <Name>AssemblyDependencyProperty.ReadOnlyProperty</Name>
+      <Name>AssemblyDependencyProperty.ReadOnly</Name>
     </ProjectReference>
     <ProjectReference Include="..\AssemblyDependencyProperty\AssemblyDependencyProperty.csproj">
       <Project>{F6FEF774-4FB4-45DB-9D63-12A325907C7A}</Project>

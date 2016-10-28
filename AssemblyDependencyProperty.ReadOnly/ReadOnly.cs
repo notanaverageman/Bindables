@@ -4,8 +4,8 @@ using Depattach;
 // ReSharper disable CheckNamespace
 // ReSharper disable UnassignedGetOnlyAutoProperty
 
-public class PropertyAttributeReadonly : DependencyObject
+public class ReadOnly : DependencyObject
 {
 	[DependencyProperty]
-	public string ReadOnly { get; }
+	public string ReadOnlyProperty { get; private set; }
 }

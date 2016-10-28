@@ -7,8 +7,8 @@
     <ProjectGuid>{E51CA02B-2D21-4B4C-BA6A-38BA4B27BC94}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AssemblyDependencyProperty.ReadOnlyProperty</RootNamespace>
-    <AssemblyName>AssemblyDependencyProperty.ReadOnlyProperty</AssemblyName>
+    <RootNamespace>AssemblyDependencyProperty.ReadOnly</RootNamespace>
+    <AssemblyName>AssemblyDependencyProperty.ReadOnly</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyAttributeReadonly.cs" />
+    <Compile Include="ReadOnly.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Depattach\Depattach.csproj">

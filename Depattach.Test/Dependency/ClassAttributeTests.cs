@@ -53,15 +53,6 @@ namespace Depattach.Test.Dependency
 		}
 
 		[Test]
-		public void ValidateReadonlyPropertiesAreNotTouched()
-		{
-			Type type = _assembly.GetType(nameof(ClassAttribute));
-			FieldInfo fieldInfo = type.GetField($"{nameof(ClassAttribute.Readonly)}Property");
-
-			Assert.IsNull(fieldInfo);
-		}
-
-		[Test]
 		public void ValidateNonAutoPropertiesAreNotTouched()
 		{
 			Type type = _assembly.GetType(nameof(ClassAttribute));

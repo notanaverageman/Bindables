@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Depattach", "Depattach\Depattach.csproj", "{DE9E483A-ED6F-4EC1-A218-A1E104CC305B}"
 EndProject
@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty.NonAutoProperty", "AssemblyDependencyProperty.NonAutoProperty\AssemblyDependencyProperty.NonAutoProperty.csproj", "{90A14E57-2C6A-429F-BB44-066AF047E7F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty.ReadOnlyProperty", "AssemblyDependencyProperty.ReadOnlyProperty\AssemblyDependencyProperty.ReadOnlyProperty.csproj", "{E51CA02B-2D21-4B4C-BA6A-38BA4B27BC94}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty.ReadOnly", "AssemblyDependencyProperty.ReadOnly\AssemblyDependencyProperty.ReadOnly.csproj", "{E51CA02B-2D21-4B4C-BA6A-38BA4B27BC94}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty.DefaultValue", "AssemblyDependencyProperty.DefaultValue\AssemblyDependencyProperty.DefaultValue.csproj", "{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84}"
 EndProject

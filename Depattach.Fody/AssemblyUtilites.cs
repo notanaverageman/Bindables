@@ -100,5 +100,10 @@ namespace Depattach.Fody
 		{
 			return typeDefinition.Fields.FirstOrDefault(f => f.Name == $"<{propertyDefinition.Name}>k__BackingField" && f.FieldType.FullName == propertyDefinition.PropertyType.FullName);
 		}
+
+		public static bool IsReadOnly(this PropertyDefinition propertyDefinition)
+		{
+			return !propertyDefinition.SetMethod.IsPublic;
+		}
 	}
 }

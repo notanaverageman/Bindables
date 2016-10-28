@@ -9,6 +9,7 @@ namespace Depattach.Test
 	{
 		public const string DependencyProperty = "AssemblyDependencyProperty.dll";
 		public const string DependencyPropertyDefaultValue = "AssemblyDependencyProperty.DefaultValue.dll";
+		public const string DependencyPropertyReadOnly = "AssemblyDependencyProperty.ReadOnly.dll";
 
 		public static Assembly Weave(string assemblyName)
 		{
@@ -25,6 +26,8 @@ namespace Depattach.Test
 
 				module.Write(stream);
 				stream.Seek(0, SeekOrigin.Begin);
+
+				module.Write(@"C:\Users\yusuf.gunaydin\Desktop\Test.dll");
 
 				return Assembly.Load(stream.ToArray());
 			}

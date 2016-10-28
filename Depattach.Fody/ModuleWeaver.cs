@@ -13,11 +13,19 @@ namespace Depattach.Fody
 	{
 		private const string DependencyPropertyLibraryName = "DepAttachMarker";
 
+		private TypeReference _dependencyPropertyKeyTypeReference;
 		private TypeReference _dependencyObjectTypeReference;
+
 		private MethodReference _getTypeFromHandleMethodReference;
+
 		private MethodReference _registerDependencyProperty;
+		private MethodReference _registerDependencyPropertyReadOnly;
+
 		private MethodReference _setValue;
+		private MethodReference _setValueDependencyPropertyKey;
 		private MethodReference _getValue;
+		private MethodReference _getDependencyProperty;
+
 		private MethodReference _frameworkPropertyMetadataConstructor;
 
 		public Action<string> LogInfo { get; set; }
@@ -32,11 +40,19 @@ namespace Depattach.Fody
 		{
 			AssemblyNameReference dependencyPropertyAssemblyNameReference = ModuleDefinition.AssemblyReferences.FirstOrDefault(reference => reference.Name == DependencyPropertyLibraryName);
 
+			_dependencyPropertyKeyTypeReference = ModuleDefinition.ImportReference(typeof(DependencyPropertyKey));
 			_dependencyObjectTypeReference = ModuleDefinition.ImportReference(typeof(DependencyObject));
+
 			_getTypeFromHandleMethodReference = ModuleDefinition.ImportMethod(typeof(Type), nameof(Type.GetTypeFromHandle), typeof(RuntimeTypeHandle));
+
 			_registerDependencyProperty = ModuleDefinition.ImportMethod(typeof(DependencyProperty), nameof(DependencyProperty.Register), typeof(string), typeof(Type), typeof(Type), typeof(PropertyMetadata));
+			_registerDependencyPropertyReadOnly = ModuleDefinition.ImportMethod(typeof(DependencyProperty), nameof(DependencyProperty.RegisterReadOnly), typeof(string), typeof(Type), typeof(Type), typeof(PropertyMetadata));
+
 			_setValue = ModuleDefinition.ImportMethod(typeof(DependencyObject), nameof(DependencyObject.SetValue), typeof(DependencyProperty), typeof(object));
+			_setValueDependencyPropertyKey = ModuleDefinition.ImportMethod(typeof(DependencyObject), nameof(DependencyObject.SetValue), typeof(DependencyPropertyKey), typeof(object));
 			_getValue = ModuleDefinition.ImportMethod(typeof(DependencyObject), nameof(DependencyObject.GetValue), typeof(DependencyProperty));
+			_getDependencyProperty = ModuleDefinition.ImportMethod(typeof(DependencyPropertyKey), $"get_{nameof(DependencyPropertyKey.DependencyProperty)}");
+
 			_frameworkPropertyMetadataConstructor = ModuleDefinition.ImportConstructor(typeof(FrameworkPropertyMetadata), typeof(object));
 
 			foreach (TypeDefinition typeDefinition in ModuleDefinition.Types)
@@ -61,7 +77,7 @@ namespace Depattach.Fody
 				typeDefinition.CreateStaticConstructorIfNotExists();
 
 				Dictionary<PropertyDefinition, Range> instructionRanges = typeDefinition.InterpretDefaultValues(propertiesToConvert);
-				
+
 				foreach (PropertyDefinition propertyDefinition in propertiesToConvert)
 				{
 					propertyDefinition.ValidateBeforeConversion(typeDefinition);
@@ -87,12 +103,29 @@ namespace Depattach.Fody
 			string fieldName = propertyDefinition.Name + "Property";
 			FieldDefinition fieldDefinition = new FieldDefinition(fieldName, FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.Public, _dependencyObjectTypeReference);
 
-			AddInitializationToStaticConstructor(typeDefinition, propertyDefinition, fieldDefinition, range);
-
 			typeDefinition.Fields.Add(fieldDefinition);
 
-			CreateGetMethod(propertyDefinition, fieldDefinition);
-			CreateSetMethod(propertyDefinition, fieldDefinition);
+			if (propertyDefinition.IsReadOnly())
+			{
+				string dependencyPropertyKeyFieldName = propertyDefinition.Name + "PropertyKey";
+				FieldDefinition dependencyPropertyKeyFieldDefinition = new FieldDefinition(dependencyPropertyKeyFieldName, FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.Private, _dependencyPropertyKeyTypeReference);
+
+				typeDefinition.Fields.Add(dependencyPropertyKeyFieldDefinition);
+
+				AddInitializationToStaticConstructorReadonly(typeDefinition, propertyDefinition, dependencyPropertyKeyFieldDefinition, fieldDefinition, range);
+
+				propertyDefinition.SetMethod.Body.Instructions.Clear();
+				propertyDefinition.CustomAttributes.Clear();
+
+				ModifySetMethod(propertyDefinition, dependencyPropertyKeyFieldDefinition, true);
+			}
+			else
+			{
+				AddInitializationToStaticConstructor(typeDefinition, propertyDefinition, fieldDefinition, range);
+				ModifySetMethod(propertyDefinition, fieldDefinition, false);
+			}
+
+			ModifyGetMethod(propertyDefinition, fieldDefinition);
 
 			typeDefinition.Fields.Remove(backingField);
 		}
@@ -125,24 +158,39 @@ namespace Depattach.Fody
 			}
 		}
 
-		private void CreateSetMethod(PropertyDefinition propertyDefinition, FieldDefinition fieldDefinition)
+		private void AddInitializationToStaticConstructorReadonly(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition, FieldDefinition dependencyPropertyKeyFieldDefinition, FieldDefinition fieldDefinition, Range range)
 		{
-			MethodDefinition setter = propertyDefinition.SetMethod;
-			Collection<Instruction> setterInstructions = setter.Body.Instructions;
+			MethodDefinition staticConstructor = typeDefinition.GetStaticConstructor();
 
-			setterInstructions.Clear();
-			setterInstructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-			setterInstructions.Add(Instruction.Create(OpCodes.Ldsfld, fieldDefinition));
-			setterInstructions.Add(Instruction.Create(OpCodes.Ldarg_1));
-			if (propertyDefinition.PropertyType.IsValueType)
+			List<Instruction> instructions = new List<Instruction>
 			{
-				setterInstructions.Add(Instruction.Create(OpCodes.Box, propertyDefinition.PropertyType));
+				Instruction.Create(OpCodes.Ldstr, propertyDefinition.Name),
+				Instruction.Create(OpCodes.Ldtoken, propertyDefinition.PropertyType),
+				Instruction.Create(OpCodes.Call, _getTypeFromHandleMethodReference),
+				Instruction.Create(OpCodes.Ldtoken, typeDefinition),
+				Instruction.Create(OpCodes.Call, _getTypeFromHandleMethodReference)
+			};
+
+			instructions.AppendDefaultValueInstructions(typeDefinition, propertyDefinition, range);
+
+			instructions.Add(Instruction.Create(OpCodes.Newobj, _frameworkPropertyMetadataConstructor));
+
+			instructions.Add(Instruction.Create(OpCodes.Call, _registerDependencyPropertyReadOnly));
+			instructions.Add(Instruction.Create(OpCodes.Stsfld, dependencyPropertyKeyFieldDefinition));
+
+			instructions.Add(Instruction.Create(OpCodes.Ldsfld, dependencyPropertyKeyFieldDefinition));
+			instructions.Add(Instruction.Create(OpCodes.Callvirt, _getDependencyProperty));
+			instructions.Add(Instruction.Create(OpCodes.Stsfld, fieldDefinition));
+
+			instructions.Reverse();
+
+			foreach (Instruction instruction in instructions)
+			{
+				staticConstructor.Body.Instructions.Insert(0, instruction);
 			}
-			setterInstructions.Add(Instruction.Create(OpCodes.Call, _setValue));
-			setterInstructions.Add(Instruction.Create(OpCodes.Ret));
 		}
 
-		private void CreateGetMethod(PropertyDefinition propertyDefinition, FieldDefinition fieldDefinition)
+		private void ModifyGetMethod(PropertyDefinition propertyDefinition, FieldDefinition fieldDefinition)
 		{
 			MethodDefinition getter = propertyDefinition.GetMethod;
 			Collection<Instruction> getterInstructions = getter.Body.Instructions;
@@ -155,6 +203,30 @@ namespace Depattach.Fody
 				? Instruction.Create(OpCodes.Unbox_Any, propertyDefinition.PropertyType)
 				: Instruction.Create(OpCodes.Castclass, propertyDefinition.PropertyType));
 			getterInstructions.Add(Instruction.Create(OpCodes.Ret));
+		}
+
+		private void ModifySetMethod(PropertyDefinition propertyDefinition, FieldDefinition fieldDefinition, bool isReadonly)
+		{
+			MethodDefinition setter = propertyDefinition.SetMethod;
+			Collection<Instruction> setterInstructions = setter.Body.Instructions;
+
+			setterInstructions.Clear();
+			setterInstructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+			setterInstructions.Add(Instruction.Create(OpCodes.Ldsfld, fieldDefinition));
+			setterInstructions.Add(Instruction.Create(OpCodes.Ldarg_1));
+			if (propertyDefinition.PropertyType.IsValueType)
+			{
+				setterInstructions.Add(Instruction.Create(OpCodes.Box, propertyDefinition.PropertyType));
+			}
+			if (isReadonly)
+			{
+				setterInstructions.Add(Instruction.Create(OpCodes.Call, _setValueDependencyPropertyKey));
+			}
+			else
+			{
+				setterInstructions.Add(Instruction.Create(OpCodes.Call, _setValue));
+			}
+			setterInstructions.Add(Instruction.Create(OpCodes.Ret));
 		}
 	}
 }

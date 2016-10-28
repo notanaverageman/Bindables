@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Windows;
-using FluentAssertions;
 using NUnit.Framework;
 
 namespace Depattach.Test.Dependency
