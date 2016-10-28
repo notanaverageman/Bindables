@@ -59,6 +59,11 @@ namespace Depattach.Fody
 			{
 				throw new InvalidOperationException("Cannot convert to dependency property because the property does not have a backing field.");
 			}
+
+			if (propertyDefinition.GetMethod == null || propertyDefinition.SetMethod == null)
+			{
+				throw new InvalidOperationException("Cannot convert to dependency property because the property is read-only.");
+			}
 		}
 
 		public static void ValidateBeforeConversion(this TypeDefinition typeDefinition, TypeReference dependencyObject)
