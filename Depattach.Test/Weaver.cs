@@ -26,8 +26,6 @@ namespace Depattach.Test
 				module.Write(stream);
 				stream.Seek(0, SeekOrigin.Begin);
 
-				module.Write(@"C:\Users\Yusuf\Desktop\Test.dll");
-
 				return Assembly.Load(stream.ToArray());
 			}
 		}

@@ -40,25 +40,5 @@ namespace Depattach.Test.Dependency
 			
 			Assert.AreEqual(1, instance.GetValue(valueProperty));
 		}
-
-		[Test]
-		public void ValidateConstructorInitializationIsNotTakenIntoAccountReferenceType()
-		{
-			Type type = _assembly.GetType(nameof(DefaultValue));
-			dynamic instance = Activator.CreateInstance(type);
-
-			string defaultValue = instance.ReferenceInitializedInConstructor;
-			defaultValue.ShouldBeEquivalentTo("Default");
-		}
-
-		[Test]
-		public void ValidateConstructorInitializationIsNotTakenIntoAccountValueType()
-		{
-			Type type = _assembly.GetType(nameof(DefaultValue));
-			dynamic instance = Activator.CreateInstance(type);
-
-			int defaultValue = instance.ValueInitializedInConstructor;
-			defaultValue.ShouldBeEquivalentTo(1);
-		}
 	}
 }

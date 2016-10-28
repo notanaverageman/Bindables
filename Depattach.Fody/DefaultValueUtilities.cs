@@ -9,24 +9,6 @@ namespace Depattach.Fody
 {
 	public static class DefaultValueUtilities
 	{
-		public static VariableDefinition AddInstrunctionForDefaultValue(this List<Instruction> instructions, PropertyDefinition propertyDefinition)
-		{
-			if (!propertyDefinition.PropertyType.IsValueType)
-			{
-				instructions.Add(Instruction.Create(OpCodes.Ldnull));
-				return null;
-			}
-
-			VariableDefinition variable = new VariableDefinition(propertyDefinition.PropertyType);
-
-			instructions.Add(Instruction.Create(OpCodes.Ldloca_S, variable));
-			instructions.Add(Instruction.Create(OpCodes.Initobj, propertyDefinition.PropertyType));
-			instructions.Add(Instruction.Create(OpCodes.Ldloc, variable));
-			instructions.Add(Instruction.Create(OpCodes.Box, propertyDefinition.PropertyType));
-
-			return variable;
-		}
-
 		public static Dictionary<PropertyDefinition, Range> InterpretDefaultValues(this TypeDefinition typeDefinition, List<PropertyDefinition> propertiesToConvert)
 		{
 			// Only auto properties can have initializers.
@@ -94,10 +76,19 @@ namespace Depattach.Fody
 		public static void AppendDefaultValueInstructions(this List<Instruction> instructions, TypeDefinition typeDefinition, PropertyDefinition propertyDefinition, Range range)
 		{
 			MethodDefinition constructor = typeDefinition.GetConstructors().First();
-			
+
 			if (range == null)
 			{
-				instructions.AddInstrunctionForDefaultValue(propertyDefinition);
+				VariableDefinition variableDefinition = instructions.AddInstrunctionForDefaultValue(propertyDefinition);
+
+				if (variableDefinition != null)
+				{
+					MethodDefinition staticConstructor = typeDefinition.GetStaticConstructor();
+
+					staticConstructor.Body.Variables.Add(variableDefinition);
+					staticConstructor.Body.InitLocals = true;
+				}
+
 				return;
 			}
 
@@ -121,9 +112,27 @@ namespace Depattach.Fody
 				: Instruction.Create(OpCodes.Castclass, typeDefinition.Module.TypeSystem.Object));
 		}
 
+		private static VariableDefinition AddInstrunctionForDefaultValue(this List<Instruction> instructions, PropertyDefinition propertyDefinition)
+		{
+			if (!propertyDefinition.PropertyType.IsValueType)
+			{
+				instructions.Add(Instruction.Create(OpCodes.Ldnull));
+				return null;
+			}
+
+			VariableDefinition variable = new VariableDefinition(propertyDefinition.PropertyType);
+
+			instructions.Add(Instruction.Create(OpCodes.Ldloca_S, variable));
+			instructions.Add(Instruction.Create(OpCodes.Initobj, propertyDefinition.PropertyType));
+			instructions.Add(Instruction.Create(OpCodes.Ldloc, variable));
+			instructions.Add(Instruction.Create(OpCodes.Box, propertyDefinition.PropertyType));
+
+			return variable;
+		}
+
 		public static void RemoveInitializationInstructionsFromAllConstructors(this TypeDefinition typeDefinition, Dictionary<PropertyDefinition, Range> instructionRanges)
 		{
-			List<Range> ranges = instructionRanges.Values.ToList();
+			List<Range> ranges = instructionRanges.Values.Where(range => range != null).ToList();
 			ranges.Sort();
 
 			MethodDefinition staticConstructor = typeDefinition.GetStaticConstructor();
