@@ -11,7 +11,7 @@ namespace Depattach.Fody
 {
 	public class ModuleWeaver
 	{
-		private const string DependencyPropertyLibraryName = "DepAttachMarker";
+		private const string DependencyPropertyLibraryName = "DepAttach";
 
 		private TypeReference _dependencyPropertyKeyTypeReference;
 		private TypeReference _dependencyObjectTypeReference;
@@ -218,15 +218,10 @@ namespace Depattach.Fody
 			{
 				setterInstructions.Add(Instruction.Create(OpCodes.Box, propertyDefinition.PropertyType));
 			}
-			if (isReadonly)
-			{
-				setterInstructions.Add(Instruction.Create(OpCodes.Call, _setValueDependencyPropertyKey));
-			}
-			else
-			{
-				setterInstructions.Add(Instruction.Create(OpCodes.Call, _setValue));
-			}
-			setterInstructions.Add(Instruction.Create(OpCodes.Ret));
+		    setterInstructions.Add(isReadonly
+		        ? Instruction.Create(OpCodes.Call, _setValueDependencyPropertyKey)
+		        : Instruction.Create(OpCodes.Call, _setValue));
+		    setterInstructions.Add(Instruction.Create(OpCodes.Ret));
 		}
 	}
 }

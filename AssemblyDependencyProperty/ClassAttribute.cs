@@ -15,6 +15,11 @@ public class ClassAttribute : DependencyObject
 		get { return _nonAuto; }
 		set { _nonAuto = value; }
 	}
+
+    public int ReadOnly { get; }
+
+    [ExcludeDependencyProperty]
+    public int Excluded { get; set; }
 	
 	public string Reference { get; set; }
 	public int Value { get; set; }

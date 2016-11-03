@@ -45,6 +45,11 @@ namespace Depattach.Fody
 				{
 					return false;
 				}
+
+			    if (propertyDefinition.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(ExcludeDependencyPropertyAttribute).FullName))
+			    {
+			        return false;
+			    }
 			}
 
 			return true;

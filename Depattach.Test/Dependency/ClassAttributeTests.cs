@@ -60,5 +60,23 @@ namespace Depattach.Test.Dependency
 
 			Assert.IsNull(fieldInfo);
 		}
+
+		[Test]
+		public void ValidateReadOnlyPropertiesAreNotTouched()
+		{
+			Type type = _assembly.GetType(nameof(ClassAttribute));
+			FieldInfo fieldInfo = type.GetField($"{nameof(ClassAttribute.ReadOnly)}Property");
+
+			Assert.IsNull(fieldInfo);
+		}
+
+		[Test]
+		public void ValidateExcludedPropertiesAreNotTouched()
+		{
+			Type type = _assembly.GetType(nameof(ClassAttribute));
+			FieldInfo fieldInfo = type.GetField($"{nameof(ClassAttribute.Excluded)}Property");
+
+			Assert.IsNull(fieldInfo);
+		}
 	}
 }
