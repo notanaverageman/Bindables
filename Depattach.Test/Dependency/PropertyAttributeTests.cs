@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Data;
 using NUnit.Framework;
 
 namespace Depattach.Test.Dependency
@@ -50,6 +51,32 @@ namespace Depattach.Test.Dependency
 			instance.SetValue(valueProperty, 2);
 			Assert.AreEqual(2, instance.Value);
 			Assert.AreEqual(2, instance.GetValue(valueProperty));
+		}
+
+		[Test]
+		public void ValidateConversionToDependencyPropertyWithOptions()
+		{
+			Type type = _assembly.GetType(nameof(PropertyAttribute));
+
+			DependencyProperty valueProperty = (DependencyProperty)type.GetField($"{nameof(PropertyAttribute.WithOptions)}Property").GetValue(null);
+
+			dynamic instance = Activator.CreateInstance(type);
+			WithOptionsViewModel viewModel = new WithOptionsViewModel();
+
+			Binding binding = new Binding(nameof(WithOptionsViewModel.Source))
+			{
+				Source = viewModel
+			};
+			BindingOperations.SetBinding(instance, valueProperty, binding);
+
+			instance.WithOptions = 2;
+
+			Assert.AreEqual(2, viewModel.Source);
+		}
+
+		private class WithOptionsViewModel
+		{
+			public int Source { get; set; }
 		}
 	}
 }

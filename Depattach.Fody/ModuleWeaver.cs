@@ -27,6 +27,7 @@ namespace Depattach.Fody
 		private MethodReference _getDependencyProperty;
 
 		private MethodReference _frameworkPropertyMetadataConstructor;
+		private MethodReference _frameworkPropertyMetadataConstructorWithOptions;
 
 		public Action<string> LogInfo { get; set; }
 		public ModuleDefinition ModuleDefinition { get; set; }
@@ -54,6 +55,7 @@ namespace Depattach.Fody
 			_getDependencyProperty = ModuleDefinition.ImportMethod(typeof(DependencyPropertyKey), $"get_{nameof(DependencyPropertyKey.DependencyProperty)}");
 
 			_frameworkPropertyMetadataConstructor = ModuleDefinition.ImportConstructor(typeof(FrameworkPropertyMetadata), typeof(object));
+			_frameworkPropertyMetadataConstructorWithOptions = ModuleDefinition.ImportConstructor(typeof(FrameworkPropertyMetadata), typeof(object), typeof(FrameworkPropertyMetadataOptions));
 
 			foreach (TypeDefinition typeDefinition in ModuleDefinition.Types)
 			{
@@ -134,18 +136,7 @@ namespace Depattach.Fody
 		{
 			MethodDefinition staticConstructor = typeDefinition.GetStaticConstructor();
 
-			List<Instruction> instructions = new List<Instruction>
-			{
-				Instruction.Create(OpCodes.Ldstr, propertyDefinition.Name),
-				Instruction.Create(OpCodes.Ldtoken, propertyDefinition.PropertyType),
-				Instruction.Create(OpCodes.Call, _getTypeFromHandleMethodReference),
-				Instruction.Create(OpCodes.Ldtoken, typeDefinition),
-				Instruction.Create(OpCodes.Call, _getTypeFromHandleMethodReference)
-			};
-
-			instructions.AppendDefaultValueInstructions(typeDefinition, propertyDefinition, range);
-
-			instructions.Add(Instruction.Create(OpCodes.Newobj, _frameworkPropertyMetadataConstructor));
+			List<Instruction> instructions = CreateInstructionsUpToRegistration(typeDefinition, propertyDefinition, range);
 
 			instructions.Add(Instruction.Create(OpCodes.Call, _registerDependencyProperty));
 			instructions.Add(Instruction.Create(OpCodes.Stsfld, fieldDefinition));
@@ -162,18 +153,7 @@ namespace Depattach.Fody
 		{
 			MethodDefinition staticConstructor = typeDefinition.GetStaticConstructor();
 
-			List<Instruction> instructions = new List<Instruction>
-			{
-				Instruction.Create(OpCodes.Ldstr, propertyDefinition.Name),
-				Instruction.Create(OpCodes.Ldtoken, propertyDefinition.PropertyType),
-				Instruction.Create(OpCodes.Call, _getTypeFromHandleMethodReference),
-				Instruction.Create(OpCodes.Ldtoken, typeDefinition),
-				Instruction.Create(OpCodes.Call, _getTypeFromHandleMethodReference)
-			};
-
-			instructions.AppendDefaultValueInstructions(typeDefinition, propertyDefinition, range);
-
-			instructions.Add(Instruction.Create(OpCodes.Newobj, _frameworkPropertyMetadataConstructor));
+			List<Instruction> instructions = CreateInstructionsUpToRegistration(typeDefinition, propertyDefinition, range);
 
 			instructions.Add(Instruction.Create(OpCodes.Call, _registerDependencyPropertyReadOnly));
 			instructions.Add(Instruction.Create(OpCodes.Stsfld, dependencyPropertyKeyFieldDefinition));
@@ -188,6 +168,35 @@ namespace Depattach.Fody
 			{
 				staticConstructor.Body.Instructions.Insert(0, instruction);
 			}
+		}
+
+		private List<Instruction> CreateInstructionsUpToRegistration(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition, Range range)
+		{
+			List<Instruction> instructions = new List<Instruction>
+			{
+				Instruction.Create(OpCodes.Ldstr, propertyDefinition.Name),
+				Instruction.Create(OpCodes.Ldtoken, propertyDefinition.PropertyType),
+				Instruction.Create(OpCodes.Call, _getTypeFromHandleMethodReference),
+				Instruction.Create(OpCodes.Ldtoken, typeDefinition),
+				Instruction.Create(OpCodes.Call, _getTypeFromHandleMethodReference)
+			};
+
+			instructions.AppendDefaultValueInstructions(typeDefinition, propertyDefinition, range);
+
+			CustomAttribute dependencyPropertyAttribute = propertyDefinition.GetDependencyPropertyAttribute();
+			if (dependencyPropertyAttribute?.HasProperties == true)
+			{
+				CustomAttributeArgument options = dependencyPropertyAttribute.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.Options)).Argument;
+
+				instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)options.Value));
+				instructions.Add(Instruction.Create(OpCodes.Newobj, _frameworkPropertyMetadataConstructorWithOptions));
+			}
+			else
+			{
+				instructions.Add(Instruction.Create(OpCodes.Newobj, _frameworkPropertyMetadataConstructor));
+			}
+
+			return instructions;
 		}
 
 		private void ModifyGetMethod(PropertyDefinition propertyDefinition, FieldDefinition fieldDefinition)
@@ -218,10 +227,10 @@ namespace Depattach.Fody
 			{
 				setterInstructions.Add(Instruction.Create(OpCodes.Box, propertyDefinition.PropertyType));
 			}
-		    setterInstructions.Add(isReadonly
-		        ? Instruction.Create(OpCodes.Call, _setValueDependencyPropertyKey)
-		        : Instruction.Create(OpCodes.Call, _setValue));
-		    setterInstructions.Add(Instruction.Create(OpCodes.Ret));
+			setterInstructions.Add(isReadonly
+				? Instruction.Create(OpCodes.Call, _setValueDependencyPropertyKey)
+				: Instruction.Create(OpCodes.Call, _setValue));
+			setterInstructions.Add(Instruction.Create(OpCodes.Ret));
 		}
 	}
 }
