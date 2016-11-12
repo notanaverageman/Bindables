@@ -26,8 +26,11 @@ namespace Depattach.Fody
 		private MethodReference _getValue;
 		private MethodReference _getDependencyProperty;
 
+		private MethodReference _propertyChangedCallbackConstructor;
+
 		private MethodReference _frameworkPropertyMetadataConstructor;
 		private MethodReference _frameworkPropertyMetadataConstructorWithOptions;
+		private MethodReference _frameworkPropertyMetadataConstructorWithOptionsAndPropertyChangedCallback;
 
 		public Action<string> LogInfo { get; set; }
 		public ModuleDefinition ModuleDefinition { get; set; }
@@ -54,8 +57,11 @@ namespace Depattach.Fody
 			_getValue = ModuleDefinition.ImportMethod(typeof(DependencyObject), nameof(DependencyObject.GetValue), typeof(DependencyProperty));
 			_getDependencyProperty = ModuleDefinition.ImportMethod(typeof(DependencyPropertyKey), $"get_{nameof(DependencyPropertyKey.DependencyProperty)}");
 
+			_propertyChangedCallbackConstructor = ModuleDefinition.ImportSingleConstructor(typeof(PropertyChangedCallback));
+
 			_frameworkPropertyMetadataConstructor = ModuleDefinition.ImportConstructor(typeof(FrameworkPropertyMetadata), typeof(object));
 			_frameworkPropertyMetadataConstructorWithOptions = ModuleDefinition.ImportConstructor(typeof(FrameworkPropertyMetadata), typeof(object), typeof(FrameworkPropertyMetadataOptions));
+			_frameworkPropertyMetadataConstructorWithOptionsAndPropertyChangedCallback = ModuleDefinition.ImportConstructor(typeof(FrameworkPropertyMetadata), typeof(object), typeof(FrameworkPropertyMetadataOptions), typeof(PropertyChangedCallback));
 
 			foreach (TypeDefinition typeDefinition in ModuleDefinition.Types)
 			{
@@ -188,8 +194,31 @@ namespace Depattach.Fody
 			{
 				CustomAttributeArgument options = dependencyPropertyAttribute.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.Options)).Argument;
 
-				instructions.Add(Instruction.Create(OpCodes.Ldc_I4, (int)options.Value));
-				instructions.Add(Instruction.Create(OpCodes.Newobj, _frameworkPropertyMetadataConstructorWithOptions));
+				instructions.Add(options.Value == null
+					? Instruction.Create(OpCodes.Ldc_I4, (int) FrameworkPropertyMetadataOptions.None)
+					: Instruction.Create(OpCodes.Ldc_I4, (int) options.Value));
+
+				string propertyChangedCallback = dependencyPropertyAttribute.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.OnPropertyChanged)).Argument.Value as string;
+				if (String.IsNullOrEmpty(propertyChangedCallback))
+				{
+					instructions.Add(Instruction.Create(OpCodes.Newobj, _frameworkPropertyMetadataConstructorWithOptions));
+				}
+				else
+				{
+					try
+					{
+						MethodReference method = ModuleDefinition.ImportMethod(typeDefinition, propertyChangedCallback, typeof(DependencyObject), typeof(DependencyPropertyChangedEventArgs));
+
+						instructions.Add(Instruction.Create(OpCodes.Ldnull));
+						instructions.Add(Instruction.Create(OpCodes.Ldftn, method));
+						instructions.Add(Instruction.Create(OpCodes.Newobj, _propertyChangedCallbackConstructor));
+						instructions.Add(Instruction.Create(OpCodes.Newobj, _frameworkPropertyMetadataConstructorWithOptionsAndPropertyChangedCallback));
+					}
+					catch (ArgumentException)
+					{
+						throw new InvalidOperationException();
+					}
+				}
 			}
 			else
 			{

@@ -74,6 +74,20 @@ namespace Depattach.Test.Dependency
 			Assert.AreEqual(2, viewModel.Source);
 		}
 
+		[Test]
+		public void ValidateConversionToDependencyPropertyWithPropertyChangedCallback()
+		{
+			Type type = _assembly.GetType(nameof(PropertyAttribute));
+
+			dynamic instance = Activator.CreateInstance(type);
+			instance.PropertyChangedCallback = 2;
+
+			PropertyInfo propertyInfo = type.GetProperty(nameof(PropertyAttribute.IsCallbackCalled));
+			bool isCallbackCalled = (bool)propertyInfo.GetValue(null);
+
+			Assert.AreEqual(true, isCallbackCalled);
+		}
+
 		private class WithOptionsViewModel
 		{
 			public int Source { get; set; }

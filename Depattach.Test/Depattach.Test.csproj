@@ -81,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dependency\PropertyAttributeTests.NonAuto.cs" />
+    <Compile Include="Dependency\PropertyAttributeTests.InvalidCallbackMethod.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +92,10 @@
     <ProjectReference Include="..\AssemblyDependencyProperty.NonAutoProperty\AssemblyDependencyProperty.NonAutoProperty.csproj">
       <Project>{90a14e57-2c6a-429f-bb44-066af047e7f2}</Project>
       <Name>AssemblyDependencyProperty.NonAutoProperty</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AssemblyDependencyProperty.PropertyChangedCallback\AssemblyDependencyProperty.PropertyChangedCallback.csproj">
+      <Project>{9e01b66a-094b-4133-a22d-dfe4f41b8285}</Project>
+      <Name>AssemblyDependencyProperty.PropertyChangedCallback</Name>
     </ProjectReference>
     <ProjectReference Include="..\AssemblyDependencyProperty.ReadOnlyProperty\AssemblyDependencyProperty.ReadOnlyProperty.csproj">
       <Project>{e859a0fa-b662-4052-af94-6c1f8881f5a1}</Project>

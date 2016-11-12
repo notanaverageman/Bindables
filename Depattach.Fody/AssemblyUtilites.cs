@@ -55,10 +55,25 @@ namespace Depattach.Fody
 			return GetMethodReference(moduleDefinition, constructors, parameterTypes);
 		}
 
+		public static MethodReference ImportSingleConstructor(this ModuleDefinition moduleDefinition, Type type)
+		{
+			TypeReference typeReference = moduleDefinition.ImportReference(type);
+			MethodReference constructor = typeReference.Resolve().GetConstructors().Single();
+
+			return moduleDefinition.ImportReference(constructor);
+		}
+
 		public static MethodReference ImportMethod(this ModuleDefinition moduleDefinition, Type type, string methodName, params Type[] parameterTypes)
 		{
 			TypeReference typeReference = moduleDefinition.ImportReference(type);
 			IEnumerable<MethodReference> methods = typeReference.Resolve().Methods.Where(m => m.Name == methodName);
+
+			return GetMethodReference(moduleDefinition, methods, parameterTypes);
+		}
+
+		public static MethodReference ImportMethod(this ModuleDefinition moduleDefinition, TypeDefinition type, string methodName, params Type[] parameterTypes)
+		{
+			IEnumerable<MethodReference> methods = type.Methods.Where(m => m.Name == methodName);
 
 			return GetMethodReference(moduleDefinition, methods, parameterTypes);
 		}

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Depattach", "Depattach\Depattach.csproj", "{DE9E483A-ED6F-4EC1-A218-A1E104CC305B}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty.DefaultValue", "AssemblyDependencyProperty.DefaultValue\AssemblyDependencyProperty.DefaultValue.csproj", "{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty.ReadOnlyProperty", "AssemblyDependencyProperty.ReadOnlyProperty\AssemblyDependencyProperty.ReadOnlyProperty.csproj", "{E859A0FA-B662-4052-AF94-6C1F8881F5A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty.PropertyChangedCallback", "AssemblyDependencyProperty.PropertyChangedCallback\AssemblyDependencyProperty.PropertyChangedCallback.csproj", "{9E01B66A-094B-4133-A22D-DFE4F41B8285}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{E859A0FA-B662-4052-AF94-6C1F8881F5A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E859A0FA-B662-4052-AF94-6C1F8881F5A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E859A0FA-B662-4052-AF94-6C1F8881F5A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E01B66A-094B-4133-A22D-DFE4F41B8285}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E01B66A-094B-4133-A22D-DFE4F41B8285}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E01B66A-094B-4133-A22D-DFE4F41B8285}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E01B66A-094B-4133-A22D-DFE4F41B8285}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,5 +75,6 @@ Global
 		{E51CA02B-2D21-4B4C-BA6A-38BA4B27BC94} = {6D0FBE51-0C5F-45E5-BAE0-FA26F3550425}
 		{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84} = {6D0FBE51-0C5F-45E5-BAE0-FA26F3550425}
 		{E859A0FA-B662-4052-AF94-6C1F8881F5A1} = {6D0FBE51-0C5F-45E5-BAE0-FA26F3550425}
+		{9E01B66A-094B-4133-A22D-DFE4F41B8285} = {6D0FBE51-0C5F-45E5-BAE0-FA26F3550425}
 	EndGlobalSection
 EndGlobal
