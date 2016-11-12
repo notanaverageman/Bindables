@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Windows;
 using NUnit.Framework;
 
-namespace Depattach.Test.Dependency
+namespace Bindables.Test.Dependency
 {
 	[TestFixture]
 	public class DefaultValueTests

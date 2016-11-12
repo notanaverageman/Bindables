@@ -5,7 +5,7 @@ using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using Mono.Collections.Generic;
 
-namespace Depattach.Fody
+namespace Bindables.Fody
 {
 	public static class DefaultValueUtilities
 	{

@@ -1,18 +1,18 @@
 ﻿using System;
-using Depattach.Fody;
+using Bindables.Fody;
 using FluentAssertions;
 using Mono.Cecil;
 using NUnit.Framework;
 
-namespace Depattach.Test.Dependency
+namespace Bindables.Test.Dependency
 {
 	[TestFixture]
-	public class PropertyAttributeTestsReadOnly
+	public class PropertyAttributeTestsNonAuto
 	{
 		[Test]
 		public void ValidateAttributeOnNonAutoPropertyThrowsExecption()
 		{
-			ModuleDefinition module = ModuleDefinition.ReadModule("AssemblyDependencyProperty.ReadOnlyProperty.dll");
+			ModuleDefinition module = ModuleDefinition.ReadModule("AssemblyDependencyProperty.NonAutoProperty.dll");
 
 			ModuleWeaver weavingTask = new ModuleWeaver
 			{

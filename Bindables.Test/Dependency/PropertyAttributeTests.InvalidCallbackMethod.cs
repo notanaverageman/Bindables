@@ -1,10 +1,10 @@
 ﻿using System;
-using Depattach.Fody;
+using Bindables.Fody;
 using FluentAssertions;
 using Mono.Cecil;
 using NUnit.Framework;
 
-namespace Depattach.Test.Dependency
+namespace Bindables.Test.Dependency
 {
 	[TestFixture]
 	public class PropertyAttributeTestsInvalidCallbackMethod

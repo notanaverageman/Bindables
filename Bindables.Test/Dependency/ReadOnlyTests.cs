@@ -4,7 +4,7 @@ using System.Windows;
 using Microsoft.CSharp.RuntimeBinder;
 using NUnit.Framework;
 
-namespace Depattach.Test.Dependency
+namespace Bindables.Test.Dependency
 {
 	[TestFixture]
 	public class ReadOnlyTests

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Windows;
 using Mono.Cecil;
 
-namespace Depattach.Fody
+namespace Bindables.Fody
 {
 	public static class AttributeUtilities
 	{

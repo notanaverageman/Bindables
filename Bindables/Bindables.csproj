@@ -7,8 +7,8 @@
     <ProjectGuid>{DE9E483A-ED6F-4EC1-A218-A1E104CC305B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Depattach</RootNamespace>
-    <AssemblyName>Depattach</AssemblyName>
+    <RootNamespace>Bindables</RootNamespace>
+    <AssemblyName>Bindables</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

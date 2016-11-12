@@ -45,9 +45,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Depattach\Depattach.csproj">
+    <ProjectReference Include="..\Bindables\Bindables.csproj">
       <Project>{DE9E483A-ED6F-4EC1-A218-A1E104CC305B}</Project>
-      <Name>Depattach</Name>
+      <Name>Bindables</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

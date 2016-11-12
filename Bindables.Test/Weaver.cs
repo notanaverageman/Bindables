@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Reflection;
-using Depattach.Fody;
+using Bindables.Fody;
 using Mono.Cecil;
 
-namespace Depattach.Test
+namespace Bindables.Test
 {
 	public class Weaver
 	{

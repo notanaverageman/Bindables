@@ -7,8 +7,8 @@
     <ProjectGuid>{FB2D2DF2-8542-4D1E-ABE2-DA7F1505C4E1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Depattach.Fody</RootNamespace>
-    <AssemblyName>Depattach.Fody</AssemblyName>
+    <RootNamespace>Bindables.Fody</RootNamespace>
+    <AssemblyName>Bindables.Fody</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -70,9 +70,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Depattach\Depattach.csproj">
+    <ProjectReference Include="..\Bindables\Bindables.csproj">
       <Project>{de9e483a-ed6f-4ec1-a218-a1e104cc305b}</Project>
-      <Name>Depattach</Name>
+      <Name>Bindables</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

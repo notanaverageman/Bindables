@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using Depattach;
+using Bindables;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable ConvertToAutoProperty

@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Depattach", "Depattach\Depattach.csproj", "{DE9E483A-ED6F-4EC1-A218-A1E104CC305B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables", "Bindables\Bindables.csproj", "{DE9E483A-ED6F-4EC1-A218-A1E104CC305B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Depattach.Fody", "Depattach.Fody\Depattach.Fody.csproj", "{FB2D2DF2-8542-4D1E-ABE2-DA7F1505C4E1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables.Fody", "Bindables.Fody\Bindables.Fody.csproj", "{FB2D2DF2-8542-4D1E-ABE2-DA7F1505C4E1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestAssemblies", "TestAssemblies", "{6D0FBE51-0C5F-45E5-BAE0-FA26F3550425}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Depattach.Test", "Depattach.Test\Depattach.Test.csproj", "{52BD4EA5-C19A-47AB-9AE9-89B0613E4B82}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables.Test", "Bindables.Test\Bindables.Test.csproj", "{52BD4EA5-C19A-47AB-9AE9-89B0613E4B82}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyDependencyProperty", "AssemblyDependencyProperty\AssemblyDependencyProperty.csproj", "{F6FEF774-4FB4-45DB-9D63-12A325907C7A}"
 EndProject

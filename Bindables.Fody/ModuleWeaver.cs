@@ -7,11 +7,11 @@ using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using Mono.Collections.Generic;
 
-namespace Depattach.Fody
+namespace Bindables.Fody
 {
 	public class ModuleWeaver
 	{
-		private const string DependencyPropertyLibraryName = "DepAttach";
+		private const string DependencyPropertyLibraryName = "Bindables";
 
 		private TypeReference _dependencyPropertyKeyTypeReference;
 		private TypeReference _dependencyObjectTypeReference;

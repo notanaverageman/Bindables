@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 using NUnit.Framework;
 
-namespace Depattach.Test.Dependency
+namespace Bindables.Test.Dependency
 {
 	[TestFixture]
 	public class PropertyAttributeTests

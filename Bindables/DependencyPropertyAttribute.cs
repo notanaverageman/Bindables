@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace Depattach
+namespace Bindables
 {
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = false)]
 	public class DependencyPropertyAttribute : Attribute

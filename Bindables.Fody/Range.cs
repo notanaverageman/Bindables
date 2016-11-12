@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Depattach.Fody
+namespace Bindables.Fody
 {
 	// This class does not have full blown range logic.
 	public class Range : IComparable<Range>

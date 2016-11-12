@@ -2,8 +2,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ConvertToAutoProperty
 
-using Depattach;
 using System.Windows;
+using Bindables;
 
 public class PropertyAttributeInvalidCallbackMethod : DependencyObject
 {

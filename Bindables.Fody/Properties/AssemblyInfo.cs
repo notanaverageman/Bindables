@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Depattach.Test")]
+[assembly: AssemblyTitle("Bindables.Fody")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Depattach.Test")]
+[assembly: AssemblyProduct("Bindables.Fody")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("52bd4ea5-c19a-47ab-9ae9-89b0613e4b82")]
+[assembly: Guid("fb2d2df2-8542-4d1e-abe2-da7f1505c4e1")]
 
 // Version information for an assembly consists of the following four values:
 //
