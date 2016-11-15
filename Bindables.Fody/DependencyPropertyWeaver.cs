@@ -230,6 +230,11 @@ namespace Bindables.Fody
 					try
 					{
 						MethodReference method = _moduleDefinition.ImportMethod(type, propertyChangedCallback, typeof(DependencyObject), typeof(DependencyPropertyChangedEventArgs));
+						if (method.HasThis)
+						{
+							// Found a method with desired signature, but it is not static.
+							throw new ArgumentException();
+						}
 
 						instructions.Add(Instruction.Create(OpCodes.Ldnull));
 						instructions.Add(Instruction.Create(OpCodes.Ldftn, method));
