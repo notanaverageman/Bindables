@@ -9,7 +9,7 @@ namespace Bindables.Fody
 {
 	public static class DefaultValueUtilities
 	{
-		public static Dictionary<PropertyDefinition, Range> InterpretDefaultValues(this TypeDefinition typeDefinition, List<PropertyDefinition> propertiesToConvert)
+		public static Dictionary<PropertyDefinition, Range> InterpretDefaultValues(this TypeDefinition type, List<PropertyDefinition> propertiesToConvert)
 		{
 			// Only auto properties can have initializers.
 			// Properties cannot be initialized with instance members.
@@ -19,20 +19,20 @@ namespace Bindables.Fody
 			//   Objects created with 'new' keyword.
 			// Initializers are injected to all constructors.
 
-			Dictionary<PropertyDefinition, Range> ranges = new Dictionary<PropertyDefinition, Range>();
+			Dictionary<PropertyDefinition, Range> instructionRanges = new Dictionary<PropertyDefinition, Range>();
 
-			foreach (PropertyDefinition propertyDefinition in propertiesToConvert)
+			foreach (PropertyDefinition property in propertiesToConvert)
 			{
-				Range range = GetInitializationInstructionRange(typeDefinition, propertyDefinition);
-				ranges[propertyDefinition] = range;
+				Range instructionRange = GetInitializationInstructionRange(type, property);
+				instructionRanges[property] = instructionRange;
 			}
 
-			return ranges;
+			return instructionRanges;
 		}
 
-		private static Range GetInitializationInstructionRange(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition)
+		private static Range GetInitializationInstructionRange(TypeDefinition type, PropertyDefinition property)
 		{
-			FieldDefinition backingField = typeDefinition.GetBackingFieldForProperty(propertyDefinition);
+			FieldDefinition backingField = type.GetBackingFieldForProperty(property);
 
 			if (backingField == null)
 			{
@@ -40,7 +40,7 @@ namespace Bindables.Fody
 			}
 
 			// We can use any constructor since the same code is injected into all of them.
-			MethodDefinition constructor = typeDefinition.GetConstructors().First();
+			MethodDefinition constructor = type.GetConstructors().First();
 			List<Instruction> instructions = constructor.Body.Instructions.ToList();
 
 			int startIndexForCurrentProperty = 0;
@@ -73,26 +73,26 @@ namespace Bindables.Fody
 			return null;
 		}
 
-		public static void AppendDefaultValueInstructions(this List<Instruction> instructions, TypeDefinition typeDefinition, PropertyDefinition propertyDefinition, Range range)
+		public static void AppendDefaultValueInstructions(this List<Instruction> instructions, TypeDefinition type, PropertyDefinition property, Range instructionRange)
 		{
-			MethodDefinition constructor = typeDefinition.GetConstructors().First();
+			MethodDefinition constructor = type.GetConstructors().First();
 
-			if (range == null)
+			if (instructionRange == null)
 			{
-				VariableDefinition variableDefinition = instructions.AddInstrunctionForDefaultValue(propertyDefinition);
+				VariableDefinition variable = instructions.AddInstrunctionForDefaultValue(property);
 
-				if (variableDefinition != null)
+				if (variable != null)
 				{
-					MethodDefinition staticConstructor = typeDefinition.GetStaticConstructor();
+					MethodDefinition staticConstructor = type.GetStaticConstructor();
 
-					staticConstructor.Body.Variables.Add(variableDefinition);
+					staticConstructor.Body.Variables.Add(variable);
 					staticConstructor.Body.InitLocals = true;
 				}
 
 				return;
 			}
 
-			List<Instruction> initializationInstructions = constructor.Body.Instructions.GetRange(range);
+			List<Instruction> initializationInstructions = constructor.Body.Instructions.GetRange(instructionRange);
 
 			// The last instruction should be stfld with operand as our backing field.
 			// Remove it as we will get rid of the backing field and just use the default value.
@@ -107,37 +107,37 @@ namespace Bindables.Fody
 				instructions.Add(instruction);
 			}
 
-			instructions.Add(propertyDefinition.PropertyType.IsValueType
-				? Instruction.Create(OpCodes.Box, propertyDefinition.PropertyType)
-				: Instruction.Create(OpCodes.Castclass, typeDefinition.Module.TypeSystem.Object));
+			instructions.Add(property.PropertyType.IsValueType
+				? Instruction.Create(OpCodes.Box, property.PropertyType)
+				: Instruction.Create(OpCodes.Castclass, type.Module.TypeSystem.Object));
 		}
 
-		private static VariableDefinition AddInstrunctionForDefaultValue(this List<Instruction> instructions, PropertyDefinition propertyDefinition)
+		private static VariableDefinition AddInstrunctionForDefaultValue(this List<Instruction> instructions, PropertyDefinition property)
 		{
-			if (!propertyDefinition.PropertyType.IsValueType)
+			if (!property.PropertyType.IsValueType)
 			{
 				instructions.Add(Instruction.Create(OpCodes.Ldnull));
 				return null;
 			}
 
-			VariableDefinition variable = new VariableDefinition(propertyDefinition.PropertyType);
+			VariableDefinition variable = new VariableDefinition(property.PropertyType);
 
 			instructions.Add(Instruction.Create(OpCodes.Ldloca_S, variable));
-			instructions.Add(Instruction.Create(OpCodes.Initobj, propertyDefinition.PropertyType));
+			instructions.Add(Instruction.Create(OpCodes.Initobj, property.PropertyType));
 			instructions.Add(Instruction.Create(OpCodes.Ldloc, variable));
-			instructions.Add(Instruction.Create(OpCodes.Box, propertyDefinition.PropertyType));
+			instructions.Add(Instruction.Create(OpCodes.Box, property.PropertyType));
 
 			return variable;
 		}
 
-		public static void RemoveInitializationInstructionsFromAllConstructors(this TypeDefinition typeDefinition, Dictionary<PropertyDefinition, Range> instructionRanges)
+		public static void RemoveInitializationInstructionsFromAllConstructors(this TypeDefinition type, Dictionary<PropertyDefinition, Range> instructionRanges)
 		{
 			List<Range> ranges = instructionRanges.Values.Where(range => range != null).ToList();
 			ranges.Sort();
 
-			MethodDefinition staticConstructor = typeDefinition.GetStaticConstructor();
+			MethodDefinition staticConstructor = type.GetStaticConstructor();
 
-			foreach (MethodDefinition constructor in typeDefinition.GetConstructors())
+			foreach (MethodDefinition constructor in type.GetConstructors())
 			{
 				if (constructor == staticConstructor)
 				{
@@ -158,11 +158,11 @@ namespace Bindables.Fody
 			}
 		}
 
-		private static List<Instruction> GetRange(this Collection<Instruction> instructions, Range range)
+		private static List<Instruction> GetRange(this Collection<Instruction> instructions, Range instructionRange)
 		{
 			List<Instruction> result = new List<Instruction>();
 
-			for (int i = range.Start; i <= range.End; i++)
+			for (int i = instructionRange.Start; i <= instructionRange.End; i++)
 			{
 				result.Add(instructions[i]);
 			}

@@ -10,9 +10,9 @@ namespace Bindables.Fody
 {
 	internal static class AssemblyUtilities
 	{
-		public static void CreateStaticConstructorIfNotExists(this TypeDefinition typeDefinition)
+		public static void CreateStaticConstructorIfNotExists(this TypeDefinition type)
 		{
-			MethodDefinition staticConstructor = typeDefinition.GetStaticConstructor();
+			MethodDefinition staticConstructor = type.GetStaticConstructor();
 			if (staticConstructor != null)
 			{
 				return;
@@ -25,11 +25,11 @@ namespace Bindables.Fody
 										MethodAttributes.SpecialName |
 										MethodAttributes.RTSpecialName |
 										MethodAttributes.Static,
-										typeDefinition.Module.TypeSystem.Void
+										type.Module.TypeSystem.Void
 									);
 
 			staticConstructor.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
-			typeDefinition.Methods.Add(staticConstructor);
+			type.Methods.Add(staticConstructor);
 		}
 
 		public static bool InheritsFrom(this TypeDefinition derivedType, TypeReference baseType)
@@ -65,16 +65,13 @@ namespace Bindables.Fody
 
 		public static MethodReference ImportMethod(this ModuleDefinition moduleDefinition, Type type, string methodName, params Type[] parameterTypes)
 		{
-			TypeReference typeReference = moduleDefinition.ImportReference(type);
-			IEnumerable<MethodReference> methods = typeReference.Resolve().Methods.Where(m => m.Name == methodName);
-
-			return GetMethodReference(moduleDefinition, methods, parameterTypes);
+			TypeDefinition typeDefinition = moduleDefinition.ImportReference(type).Resolve();
+			return ImportMethod(moduleDefinition, typeDefinition, methodName, parameterTypes);
 		}
 
 		public static MethodReference ImportMethod(this ModuleDefinition moduleDefinition, TypeDefinition type, string methodName, params Type[] parameterTypes)
 		{
 			IEnumerable<MethodReference> methods = type.Methods.Where(m => m.Name == methodName);
-
 			return GetMethodReference(moduleDefinition, methods, parameterTypes);
 		}
 
@@ -89,7 +86,7 @@ namespace Bindables.Fody
 					continue;
 				}
 
-				bool allSame = true;
+				bool allSame = parameters.Count == parameterTypes.Length;
 
 				for (int i = 0; i < parameters.Count; i++)
 				{
@@ -111,14 +108,14 @@ namespace Bindables.Fody
 			throw new ArgumentException("No methods found.");
 		}
 
-		public static FieldDefinition GetBackingFieldForProperty(this TypeDefinition typeDefinition, PropertyDefinition propertyDefinition)
+		public static FieldDefinition GetBackingFieldForProperty(this TypeDefinition type, PropertyDefinition property)
 		{
-			return typeDefinition.Fields.FirstOrDefault(f => f.Name == $"<{propertyDefinition.Name}>k__BackingField" && f.FieldType.FullName == propertyDefinition.PropertyType.FullName);
+			return type.Fields.FirstOrDefault(f => f.Name == $"<{property.Name}>k__BackingField" && f.FieldType.FullName == property.PropertyType.FullName);
 		}
 
-		public static bool IsReadOnly(this PropertyDefinition propertyDefinition)
+		public static bool IsReadOnly(this PropertyDefinition property)
 		{
-			return !propertyDefinition.SetMethod.IsPublic;
+			return !property.SetMethod.IsPublic;
 		}
 	}
 }
