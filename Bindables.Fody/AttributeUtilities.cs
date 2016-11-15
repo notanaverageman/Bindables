@@ -29,12 +29,12 @@ namespace Bindables.Fody
 
 			if (attribute != null && backingField == null)
 			{
-				throw new InvalidOperationException("Cannot convert to dependency property because the property does not have a backing field.");
+				throw new WeavingException("Cannot convert to dependency property because the property does not have a backing field.");
 			}
 
 			if (propertyn.GetMethod == null || propertyn.SetMethod == null)
 			{
-				throw new InvalidOperationException("Cannot convert to dependency property because the property is read-only.");
+				throw new WeavingException("Cannot convert to dependency property because the property is not an auto property.");
 			}
 		}
 
@@ -42,7 +42,7 @@ namespace Bindables.Fody
 		{
 			if (!type.InheritsFrom(dependencyObject))
 			{
-				throw new InvalidOperationException($"Your class should inherit from {typeof(DependencyObject)} to be able to define dependency properties.");
+				throw new WeavingException($"Your class should inherit from {typeof(DependencyObject)} to be able to define dependency properties.");
 			}
 		}
 	}

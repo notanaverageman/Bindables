@@ -66,6 +66,7 @@
     <Compile Include="ModuleWeaver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Range.cs" />
+    <Compile Include="WeavingException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

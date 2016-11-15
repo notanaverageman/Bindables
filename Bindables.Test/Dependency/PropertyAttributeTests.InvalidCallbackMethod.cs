@@ -20,7 +20,7 @@ namespace Bindables.Test.Dependency
 			};
 
 			Action action = () => weavingTask.Execute();
-			action.ShouldThrow<InvalidOperationException>();
+			action.ShouldThrow<WeavingException>();
 		}
 	}
 }

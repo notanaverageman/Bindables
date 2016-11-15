@@ -238,7 +238,10 @@ namespace Bindables.Fody
 					}
 					catch (ArgumentException)
 					{
-						throw new InvalidOperationException();
+						throw new WeavingException($@"No method with signature: ""void {propertyChangedCallback}({nameof(DependencyObject)}, {nameof(DependencyPropertyChangedEventArgs)})"" found.")
+						{
+							SequencePoint = property.GetMethod.Body.Instructions.First().SequencePoint
+						};
 					}
 				}
 			}
