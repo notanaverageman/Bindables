@@ -85,7 +85,6 @@
     <Compile Include="Dependency\PropertyAttributeTests.cs" />
     <Compile Include="Dependency\PropertyAttributeTests.ReadOnly.cs" />
     <Compile Include="Dependency\ReadOnlyTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Weaver.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +101,9 @@
       <Project>{DE9E483A-ED6F-4EC1-A218-A1E104CC305B}</Project>
       <Name>Bindables</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

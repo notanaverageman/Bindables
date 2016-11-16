@@ -1,13 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables", "Bindables\Bindables.csproj", "{DE9E483A-ED6F-4EC1-A218-A1E104CC305B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables.Fody", "Bindables.Fody\Bindables.Fody.csproj", "{FB2D2DF2-8542-4D1E-ABE2-DA7F1505C4E1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables.Test", "Bindables.Test\Bindables.Test.csproj", "{52BD4EA5-C19A-47AB-9AE9-89B0613E4B82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGet", "NuGet\NuGet.csproj", "{8174676A-7E04-42C2-ACF5-F9D48890C496}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F57E0626-9F84-4E4A-96B0-B2F960036995}"
+	ProjectSection(SolutionItems) = preProject
+		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +34,10 @@ Global
 		{52BD4EA5-C19A-47AB-9AE9-89B0613E4B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52BD4EA5-C19A-47AB-9AE9-89B0613E4B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52BD4EA5-C19A-47AB-9AE9-89B0613E4B82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8174676A-7E04-42C2-ACF5-F9D48890C496}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8174676A-7E04-42C2-ACF5-F9D48890C496}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8174676A-7E04-42C2-ACF5-F9D48890C496}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8174676A-7E04-42C2-ACF5-F9D48890C496}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
