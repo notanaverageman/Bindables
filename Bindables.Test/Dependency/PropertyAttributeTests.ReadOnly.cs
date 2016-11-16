@@ -1,7 +1,6 @@
 ﻿using System;
 using Bindables.Fody;
 using FluentAssertions;
-using Mono.Cecil;
 using NUnit.Framework;
 
 namespace Bindables.Test.Dependency
@@ -9,17 +8,20 @@ namespace Bindables.Test.Dependency
 	[TestFixture]
 	public class PropertyAttributeTestsReadOnly
 	{
+		private const string Code = @"
+using System.Windows;
+using Bindables;
+
+public class PropertyAttributeReadOnly : DependencyObject
+{
+	[DependencyProperty]
+	public string Property { get; }
+}";
+
 		[Test]
-		public void ValidateAttributeOnNonAutoPropertyThrowsExecption()
+		public void ValidateAttributeOnNonAutoPropertyThrowsException()
 		{
-			ModuleDefinition module = ModuleDefinition.ReadModule("AssemblyDependencyProperty.ReadOnlyProperty.dll");
-
-			ModuleWeaver weavingTask = new ModuleWeaver
-			{
-				ModuleDefinition = module
-			};
-
-			Action action = () => weavingTask.Execute();
+			Action action = () => Weaver.Weave(Code);
 			action.ShouldThrow<WeavingException>();
 		}
 	}

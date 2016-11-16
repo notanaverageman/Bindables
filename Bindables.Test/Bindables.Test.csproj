@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.2\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.2\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,6 +13,9 @@
     <AssemblyName>Bindables.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,12 +35,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FluentAssertions, Version=4.15.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentAssertions.4.15.0\lib\net45\FluentAssertions.dll</HintPath>
+    <Reference Include="FluentAssertions, Version=4.17.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentAssertions.4.17.0\lib\net45\FluentAssertions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FluentAssertions.Core, Version=4.15.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentAssertions.4.15.0\lib\net45\FluentAssertions.Core.dll</HintPath>
+    <Reference Include="FluentAssertions.Core, Version=4.17.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentAssertions.4.17.0\lib\net45\FluentAssertions.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.2\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
@@ -85,36 +94,23 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AssemblyDependencyProperty.DefaultValue\AssemblyDependencyProperty.DefaultValue.csproj">
-      <Project>{87E9E0FD-EEC4-42D9-994B-F4EA293A9E84}</Project>
-      <Name>AssemblyDependencyProperty.DefaultValue</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AssemblyDependencyProperty.NonAutoProperty\AssemblyDependencyProperty.NonAutoProperty.csproj">
-      <Project>{90a14e57-2c6a-429f-bb44-066af047e7f2}</Project>
-      <Name>AssemblyDependencyProperty.NonAutoProperty</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AssemblyDependencyProperty.PropertyChangedCallback\AssemblyDependencyProperty.PropertyChangedCallback.csproj">
-      <Project>{9e01b66a-094b-4133-a22d-dfe4f41b8285}</Project>
-      <Name>AssemblyDependencyProperty.PropertyChangedCallback</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AssemblyDependencyProperty.ReadOnlyProperty\AssemblyDependencyProperty.ReadOnlyProperty.csproj">
-      <Project>{e859a0fa-b662-4052-af94-6c1f8881f5a1}</Project>
-      <Name>AssemblyDependencyProperty.ReadOnlyProperty</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AssemblyDependencyProperty.ReadOnly\AssemblyDependencyProperty.ReadOnly.csproj">
-      <Project>{e51ca02b-2d21-4b4c-ba6a-38ba4b27bc94}</Project>
-      <Name>AssemblyDependencyProperty.ReadOnly</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AssemblyDependencyProperty\AssemblyDependencyProperty.csproj">
-      <Project>{F6FEF774-4FB4-45DB-9D63-12A325907C7A}</Project>
-      <Name>AssemblyDependencyProperty</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Bindables.Fody\Bindables.Fody.csproj">
       <Project>{fb2d2df2-8542-4d1e-abe2-da7f1505c4e1}</Project>
       <Name>Bindables.Fody</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Bindables\Bindables.csproj">
+      <Project>{DE9E483A-ED6F-4EC1-A218-A1E104CC305B}</Project>
+      <Name>Bindables</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.2\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.2\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

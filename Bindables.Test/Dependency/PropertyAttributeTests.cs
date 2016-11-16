@@ -11,10 +11,36 @@ namespace Bindables.Test.Dependency
 	{
 		private Assembly _assembly;
 
+		private const string Code = @"
+using System.Windows;
+using Bindables;
+
+public class PropertyAttribute : DependencyObject
+{
+	public static bool IsCallbackCalled { get; set; }
+
+	[DependencyProperty]
+	public string Reference { get; set; }
+
+	[DependencyProperty]
+	public int Value { get; set; }
+
+	[DependencyProperty(Options = FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)]
+	public int WithOptions { get; set; }
+
+	[DependencyProperty(OnPropertyChanged = nameof(OnPropertyChanged))]
+	public int PropertyChangedCallback { get; set; }
+
+	private static void OnPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+	{
+		IsCallbackCalled = true;
+	}
+}";
+
 		[OneTimeSetUp]
 		public void Setup()
 		{
-			_assembly = Weaver.Weave(Weaver.DependencyProperty);
+			_assembly = Weaver.Weave(Code);
 		}
 
 		[Test]
@@ -22,7 +48,7 @@ namespace Bindables.Test.Dependency
 		{
 			Type type = _assembly.GetType(nameof(PropertyAttribute));
 
-			DependencyProperty referenceProperty = (DependencyProperty)type.GetField($"{nameof(PropertyAttribute.Reference)}Property").GetValue(null);
+			DependencyProperty referenceProperty = (DependencyProperty)type.GetField("ReferenceProperty").GetValue(null);
 
 			dynamic instance = Activator.CreateInstance(type);
 
@@ -40,7 +66,7 @@ namespace Bindables.Test.Dependency
 		{
 			Type type = _assembly.GetType(nameof(PropertyAttribute));
 
-			DependencyProperty valueProperty = (DependencyProperty)type.GetField($"{nameof(PropertyAttribute.Value)}Property").GetValue(null);
+			DependencyProperty valueProperty = (DependencyProperty)type.GetField("ValueProperty").GetValue(null);
 
 			dynamic instance = Activator.CreateInstance(type);
 
@@ -58,7 +84,7 @@ namespace Bindables.Test.Dependency
 		{
 			Type type = _assembly.GetType(nameof(PropertyAttribute));
 
-			DependencyProperty valueProperty = (DependencyProperty)type.GetField($"{nameof(PropertyAttribute.WithOptions)}Property").GetValue(null);
+			DependencyProperty valueProperty = (DependencyProperty)type.GetField("WithOptionsProperty").GetValue(null);
 
 			dynamic instance = Activator.CreateInstance(type);
 			WithOptionsViewModel viewModel = new WithOptionsViewModel();
@@ -82,7 +108,7 @@ namespace Bindables.Test.Dependency
 			dynamic instance = Activator.CreateInstance(type);
 			instance.PropertyChangedCallback = 2;
 
-			PropertyInfo propertyInfo = type.GetProperty(nameof(PropertyAttribute.IsCallbackCalled));
+			PropertyInfo propertyInfo = type.GetProperty("IsCallbackCalled");
 			bool isCallbackCalled = (bool)propertyInfo.GetValue(null);
 
 			Assert.AreEqual(true, isCallbackCalled);

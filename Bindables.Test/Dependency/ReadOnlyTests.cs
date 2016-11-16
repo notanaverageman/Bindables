@@ -11,19 +11,29 @@ namespace Bindables.Test.Dependency
 	{
 		private Assembly _assembly;
 
+		private const string Code = @"
+using System.Windows;
+using Bindables;
+
+public class ReadOnly : DependencyObject
+{
+	[DependencyProperty]
+	public string ReadOnlyProperty { get; private set; }
+}";
+
 		[OneTimeSetUp]
 		public void Setup()
 		{
-			_assembly = Weaver.Weave(Weaver.DependencyPropertyReadOnly);
+			_assembly = Weaver.Weave(Code);
 		}
 
 		[Test]
 		public void ValidateConversionToDependencyPropertyReadOnlyProperty()
 		{
-			Type type = _assembly.GetType(nameof(ReadOnly));
+			Type type = _assembly.GetType("ReadOnly");
 
-			DependencyProperty readOnlyProperty = (DependencyProperty)type.GetField($"{nameof(ReadOnly.ReadOnlyProperty)}Property").GetValue(null);
-			MethodInfo setterMethod = type.GetMethod($"set_{nameof(ReadOnly.ReadOnlyProperty)}", BindingFlags.NonPublic | BindingFlags.Instance);
+			DependencyProperty readOnlyProperty = (DependencyProperty)type.GetField("ReadOnlyPropertyProperty").GetValue(null);
+			MethodInfo setterMethod = type.GetMethod("set_ReadOnlyProperty", BindingFlags.NonPublic | BindingFlags.Instance);
 
 			dynamic instance = Activator.CreateInstance(type);
 

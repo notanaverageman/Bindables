@@ -10,18 +10,31 @@ namespace Bindables.Test.Dependency
 	{
 		private Assembly _assembly;
 
+		private const string Code = @"
+using System.Windows;
+using Bindables;
+
+public class DefaultValue : DependencyObject
+{
+	[DependencyProperty]
+	public string Reference { get; set; } = ""Default"";
+
+	[DependencyProperty]
+	public int Value { get; set; } = 1;
+}";
+
 		[OneTimeSetUp]
 		public void Setup()
 		{
-			_assembly = Weaver.Weave(Weaver.DependencyPropertyDefaultValue);
+			_assembly = Weaver.Weave(Code);
 		}
 
 		[Test]
 		public void ValidateDefaultValueReferenceType()
 		{
-			Type type = _assembly.GetType(nameof(DefaultValue));
+			Type type = _assembly.GetType("DefaultValue");
 
-			DependencyProperty referenceProperty = (DependencyProperty)type.GetField($"{nameof(DefaultValue.Reference)}Property").GetValue(null);
+			DependencyProperty referenceProperty = (DependencyProperty)type.GetField("ReferenceProperty").GetValue(null);
 
 			dynamic instance = Activator.CreateInstance(type);
 			
@@ -31,9 +44,9 @@ namespace Bindables.Test.Dependency
 		[Test]
 		public void ValidateDefaultValueValueType()
 		{
-			Type type = _assembly.GetType(nameof(DefaultValue));
+			Type type = _assembly.GetType("DefaultValue");
 
-			DependencyProperty valueProperty = (DependencyProperty)type.GetField($"{nameof(DefaultValue.Value)}Property").GetValue(null);
+			DependencyProperty valueProperty = (DependencyProperty)type.GetField("ValueProperty").GetValue(null);
 
 			dynamic instance = Activator.CreateInstance(type);
 			

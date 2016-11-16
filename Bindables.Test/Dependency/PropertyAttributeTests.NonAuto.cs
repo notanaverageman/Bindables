@@ -1,7 +1,6 @@
 ﻿using System;
 using Bindables.Fody;
 using FluentAssertions;
-using Mono.Cecil;
 using NUnit.Framework;
 
 namespace Bindables.Test.Dependency
@@ -9,17 +8,26 @@ namespace Bindables.Test.Dependency
 	[TestFixture]
 	public class PropertyAttributeTestsNonAuto
 	{
+		private const string Code = @"
+using System.Windows;
+using Bindables;
+
+public class PropertyAttributeNonAuto : DependencyObject
+{
+	private int _nonAuto;
+
+	[DependencyProperty]
+	public int NonAuto
+	{
+		get { return _nonAuto; }
+		set { _nonAuto = value; }
+	}
+}";
+
 		[Test]
 		public void ValidateAttributeOnNonAutoPropertyThrowsExecption()
 		{
-			ModuleDefinition module = ModuleDefinition.ReadModule("AssemblyDependencyProperty.NonAutoProperty.dll");
-
-			ModuleWeaver weavingTask = new ModuleWeaver
-			{
-				ModuleDefinition = module
-			};
-
-			Action action = () => weavingTask.Execute();
+			Action action = () => Weaver.Weave(Code);
 			action.ShouldThrow<WeavingException>();
 		}
 	}
