@@ -1,0 +1,25 @@
+version: '0.1.{build}'
+configuration: Release
+
+# enable AssemblyInfo.cs patching with build version number
+assembly_info:
+  patch: true
+  file: CommonAssemblyInfo.cs
+  assembly_version: "{version}"
+  assembly_file_version: "{version}"
+  assembly_informational_version: "{version}"
+
+# restore NuGet packages before running MSBuild
+before_build:
+  - nuget restore
+
+# package Web Application project for Web Deploy
+build:
+  verbosity: minimal
+  
+deploy:
+  provider: NuGet
+  api_key:
+    secure: 60GlR7nN1YaHqUTl5qKsfCMxizs+rz213RufDAGKY2mJFE9nm81HZpBR2MrPHZCT
+  skip_symbols: false
+  artifact: /.*\.nupkg/
