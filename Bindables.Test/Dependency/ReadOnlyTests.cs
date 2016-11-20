@@ -17,7 +17,7 @@ using Bindables;
 
 public class ReadOnly : DependencyObject
 {
-	[DependencyProperty]
+	[DependencyProperty(IsReadOnly = true)]
 	public string ReadOnlyProperty { get; private set; }
 }";
 
@@ -31,6 +31,10 @@ public class ReadOnly : DependencyObject
 		public void ValidateConversionToDependencyPropertyReadOnlyProperty()
 		{
 			Type type = _assembly.GetType("ReadOnly");
+
+			DependencyPropertyKey readOnlyPropertyKey = (DependencyPropertyKey)type.GetField("ReadOnlyPropertyPropertyKey", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null);
+			
+			Assert.IsNotNull(readOnlyPropertyKey);
 
 			DependencyProperty readOnlyProperty = (DependencyProperty)type.GetField("ReadOnlyPropertyProperty").GetValue(null);
 			MethodInfo setterMethod = type.GetMethod("set_ReadOnlyProperty", BindingFlags.NonPublic | BindingFlags.Instance);

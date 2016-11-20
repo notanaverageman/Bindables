@@ -8,5 +8,6 @@ namespace Bindables
 	{
 		public FrameworkPropertyMetadataOptions Options { get; set; }
 		public string OnPropertyChanged { get; set; }
+		public bool IsReadOnly { get; set; }
 	}
 }

@@ -44,5 +44,13 @@ namespace Bindables.Fody
 				throw new WeavingException($"Your class should inherit from {typeof(DependencyObject)} to be able to define dependency properties.");
 			}
 		}
+
+		public static bool IsReadOnly(this PropertyDefinition property)
+		{
+			CustomAttribute attribute = property.GetDependencyPropertyAttribute();
+			bool? isReadonly = attribute?.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.IsReadOnly)).Argument.Value as bool?;
+
+			return isReadonly == true;
+		}
 	}
 }

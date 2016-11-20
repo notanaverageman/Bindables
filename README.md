@@ -108,7 +108,7 @@ If you prefer this way, you can set following options:
     ```c#
     public class YourClass : DependencyObject
     {
-        [DependencyProperty(IsReadonly = true)]
+        [DependencyProperty(IsReadOnly = true)]
         public string ReadOnly { get; protected set; }
     }
     ```

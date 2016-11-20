@@ -112,10 +112,5 @@ namespace Bindables.Fody
 		{
 			return type.Fields.FirstOrDefault(f => f.Name == $"<{property.Name}>k__BackingField" && f.FieldType.FullName == property.PropertyType.FullName);
 		}
-
-		public static bool IsReadOnly(this PropertyDefinition property)
-		{
-			return !property.SetMethod.IsPublic;
-		}
 	}
 }
