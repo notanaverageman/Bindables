@@ -74,9 +74,9 @@ public class YourClass : DependencyObject
 You can specify the default value for the dependency property by initializing the auto property with that value.
 
 ```c#
+[DependencyProperty]
 public class YourClass : DependencyObject
 {
-    [DependencyProperty]
     public string Name { get; set; } = "Default";
 }
 ```
@@ -103,7 +103,7 @@ If you prefer this way, you can set following options:
         }
     }
     ```
-  - `IsReadonly` to create a readonly dependency property.  
+  - `IsReadOnly` to create a readonly dependency property.  
     Example:
     ```c#
     public class YourClass : DependencyObject
@@ -117,18 +117,18 @@ If you prefer this way, you can set following options:
     ```c#
     public class YourClass : DependencyObject
     {
-        private static readonly DependencyPropertyKey ReadonlyPropertyKey = DependencyProperty.RegisterReadOnly(
-            "ReadonlyProperty",
+        private static readonly DependencyPropertyKey ReadOnlyPropertyKey = DependencyProperty.RegisterReadOnly(
+            "ReadOnlyProperty",
             typeof(int),
             typeof(YourClass),
             new PropertyMetadata(default(int)));
     
-        public static readonly DependencyProperty ReadonlyProperty = ReadonlyPropertyKey.DependencyProperty;
+        public static readonly DependencyProperty ReadOnlyProperty = ReadOnlyPropertyKey.DependencyProperty;
     
-        public int Readonly
+        public int ReadOnly
         {
-            get { return (int)GetValue(ReadonlyProperty); }
-            protected set { SetValue(ReadonlyPropertyKey, value); }
+            get { return (int)GetValue(ReadOnlyProperty); }
+            protected set { SetValue(ReadOnlyPropertyKey, value); }
         }
     }
     ```
