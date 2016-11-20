@@ -8,7 +8,7 @@ namespace Bindables.Fody
 	{
 		public static CustomAttribute GetDependencyPropertyAttribute(this IMemberDefinition member)
 		{
-			return member.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == typeof(DependencyPropertyAttribute).FullName);
+			return member.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == nameof(DependencyPropertyAttribute));
 		}
 
 		public static void RemoveDependencyPropertyAttribute(this IMemberDefinition member)

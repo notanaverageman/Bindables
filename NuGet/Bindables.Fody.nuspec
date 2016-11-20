@@ -13,7 +13,7 @@
     <description>Fody add-in for creating dependency properties from auto properties.</description>
     <tags>Fody WPF XAML DependencyProperty, MVVM, DataBinding, ILWeaving, Cecil</tags>
     <dependencies>
-      <dependency id="Fody" version="(, 2)"/>
+      <dependency id="Fody" version="[1.29.3, 2)"/>
     </dependencies>
   </metadata>
 </package>
