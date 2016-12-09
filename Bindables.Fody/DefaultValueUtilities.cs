@@ -53,7 +53,7 @@ namespace Bindables.Fody
 			}
 
 			// For non-static constructors we can use any one of them, since the same code is injected into the all constructors.
-			MethodDefinition constructor = lookInStaticConstructor ? type.GetStaticConstructor() : type.GetConstructors().First();
+			MethodDefinition constructor = lookInStaticConstructor ? type.GetStaticConstructor() : type.GetConstructors().First(c => !c.IsStatic);
 			List<Instruction> instructions = constructor.Body.Instructions.ToList();
 
 			return GetInitializationInstructionsRange(instructions, backingField, lookInStaticConstructor ? OpCodes.Stsfld : OpCodes.Stfld);

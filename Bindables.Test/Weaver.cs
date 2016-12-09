@@ -3,9 +3,11 @@ using System.CodeDom.Compiler;
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Media;
 using Bindables.Fody;
 using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
 using Mono.Cecil;
+using NUnit.Framework;
 
 // ReSharper disable PossibleNullReferenceException
 
@@ -27,10 +29,13 @@ namespace Bindables.Test
 			parameters.ReferencedAssemblies.Add(typeof(DependencyObject).Assembly.Location);
 			parameters.ReferencedAssemblies.Add(typeof(DependencyPropertyAttribute).Assembly.Location);
 			parameters.ReferencedAssemblies.Add(typeof(FrameworkPropertyMetadataOptions).Assembly.Location);
+			parameters.ReferencedAssemblies.Add(typeof(Color).Assembly.Location);
 
-			var codeProvider = CreateCodeProvider();
+			CSharpCodeProvider codeProvider = CreateCodeProvider();
 
-			codeProvider.CompileAssemblyFromSource(parameters, code);
+			CompilerResults compilerResults = codeProvider.CompileAssemblyFromSource(parameters, code);
+
+			Assert.IsEmpty(compilerResults.Errors);
 
 			using (MemoryStream stream = new MemoryStream())
 			{
