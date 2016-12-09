@@ -80,6 +80,13 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attached\ClassAttributeTests.cs" />
+    <Compile Include="Attached\DefaultValueTests.cs" />
+    <Compile Include="Attached\PropertyAttributeTests.cs" />
+    <Compile Include="Attached\PropertyAttributeTests.InvalidCallbackMethod.cs" />
+    <Compile Include="Attached\PropertyAttributeTests.NonStatic.cs" />
+    <Compile Include="Attached\PropertyAttributeTests.NonAuto.cs" />
+    <Compile Include="Attached\PropertyAttributeTests.ReadOnly.cs" />
     <Compile Include="Dependency\ClassAttributeTests.cs" />
     <Compile Include="Dependency\DefaultValueTests.cs" />
     <Compile Include="Dependency\PropertyAttributeTests.cs" />

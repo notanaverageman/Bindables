@@ -38,7 +38,9 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AttachedPropertyAttribute.cs" />
     <Compile Include="DependencyPropertyAttribute.cs" />
+    <Compile Include="ExcludeAttachedPropertyAttribute.cs" />
     <Compile Include="ExcludeDependencyPropertyAttribute.cs" />
   </ItemGroup>
   <ItemGroup>

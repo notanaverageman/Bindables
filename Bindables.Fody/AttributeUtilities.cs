@@ -11,33 +11,44 @@ namespace Bindables.Fody
 			return member.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == nameof(DependencyPropertyAttribute));
 		}
 
-		public static void RemoveDependencyPropertyAttribute(this IMemberDefinition member)
+		public static CustomAttribute GetAttachedPropertyAttribute(this IMemberDefinition member)
 		{
-			CustomAttribute attribute = member.GetDependencyPropertyAttribute();
+			return member.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == nameof(AttachedPropertyAttribute));
+		}
 
-			if (attribute != null)
+		public static void RemoveBindableAttributes(this IMemberDefinition member)
+		{
+			CustomAttribute dependencyPropertyAttribute = member.GetDependencyPropertyAttribute();
+			CustomAttribute attachedPropertyAttribute = member.GetAttachedPropertyAttribute();
+
+			if (dependencyPropertyAttribute != null)
 			{
-				member.CustomAttributes.Remove(attribute);
+				member.CustomAttributes.Remove(dependencyPropertyAttribute);
+			}
+
+			if (attachedPropertyAttribute != null)
+			{
+				member.CustomAttributes.Remove(attachedPropertyAttribute);
 			}
 		}
 
-		public static void ValidateBeforeConversion(this PropertyDefinition propertyn, TypeDefinition type)
+		public static void ValidateBeforeDependencyPropertyConversion(this PropertyDefinition property, TypeDefinition type)
 		{
-			CustomAttribute attribute = propertyn.GetDependencyPropertyAttribute();
-			FieldDefinition backingField = type.GetBackingFieldForProperty(propertyn);
+			CustomAttribute attribute = property.GetDependencyPropertyAttribute();
+			FieldDefinition backingField = type.GetBackingFieldForProperty(property);
 
 			if (attribute != null && backingField == null)
 			{
 				throw new WeavingException("Cannot convert to dependency property because the property does not have a backing field.");
 			}
 
-			if (propertyn.GetMethod == null || propertyn.SetMethod == null)
+			if (property.GetMethod == null || property.SetMethod == null)
 			{
 				throw new WeavingException("Cannot convert to dependency property because the property is not an auto property.");
 			}
 		}
 
-		public static void ValidateBeforeConversion(this TypeDefinition type, TypeReference dependencyObject)
+		public static void ValidateBeforeDependencyPropertyConversion(this TypeDefinition type, TypeReference dependencyObject)
 		{
 			if (!type.InheritsFrom(dependencyObject))
 			{
@@ -45,7 +56,28 @@ namespace Bindables.Fody
 			}
 		}
 
-		public static bool IsReadOnly(this PropertyDefinition property)
+		public static void ValidateBeforeAttachedPropertyConversion(this PropertyDefinition property, TypeDefinition type)
+		{
+			CustomAttribute attribute = property.GetAttachedPropertyAttribute();
+			FieldDefinition backingField = type.GetBackingFieldForProperty(property);
+
+			if (attribute != null && backingField == null)
+			{
+				throw new WeavingException("Cannot convert to attached property because the property does not have a backing field.");
+			}
+
+			if (property.GetMethod == null || property.SetMethod == null)
+			{
+				throw new WeavingException("Cannot convert to attached property because the property is not an auto property.");
+			}
+
+			if (!property.GetMethod.IsStatic)
+			{
+				throw new WeavingException("Cannot convert to attached property because the property is not static.");
+			}
+		}
+
+		public static bool IsMarkedAsReadOnly(this PropertyDefinition property)
 		{
 			CustomAttribute attribute = property.GetDependencyPropertyAttribute();
 			bool? isReadonly = attribute?.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.IsReadOnly)).Argument.Value as bool?;

@@ -43,7 +43,6 @@ namespace Bindables.Test
 				};
 
 				weavingTask.Execute();
-
 				module.Write(stream);
 				stream.Seek(0, SeekOrigin.Begin);
 

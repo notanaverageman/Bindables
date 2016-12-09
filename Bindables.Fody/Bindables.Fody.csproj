@@ -60,10 +60,12 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyUtilites.cs" />
+    <Compile Include="AttachedPropertyWeaver.cs" />
     <Compile Include="AttributeUtilities.cs" />
     <Compile Include="DefaultValueUtilities.cs" />
     <Compile Include="DependencyPropertyWeaver.cs" />
     <Compile Include="ModuleWeaver.cs" />
+    <Compile Include="PropertyWeaverBase.cs" />
     <Compile Include="Range.cs" />
     <Compile Include="WeavingException.cs" />
   </ItemGroup>

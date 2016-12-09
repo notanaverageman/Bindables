@@ -9,28 +9,41 @@ namespace Bindables.Fody
 {
 	public static class DefaultValueUtilities
 	{
+		// Only auto properties can have initializers.
+		// Properties cannot be initialized with instance members.
+		// Allowed initializations:
+		//   Static methods, properties, fields.
+		//   Compile time constants.
+		//   Objects created with 'new' keyword.
+		// Initializers are injected to all constructors.
+
 		public static Dictionary<PropertyDefinition, Range> InterpretDefaultValues(this TypeDefinition type, List<PropertyDefinition> propertiesToConvert)
 		{
-			// Only auto properties can have initializers.
-			// Properties cannot be initialized with instance members.
-			// Allowed initializations:
-			//   Static methods, properties, fields.
-			//   Compile time constants.
-			//   Objects created with 'new' keyword.
-			// Initializers are injected to all constructors.
-
 			Dictionary<PropertyDefinition, Range> instructionRanges = new Dictionary<PropertyDefinition, Range>();
 
 			foreach (PropertyDefinition property in propertiesToConvert)
 			{
-				Range instructionRange = GetInitializationInstructionRange(type, property);
+				Range instructionRange = GetInitializationInstructionsRange(type, property, false);
 				instructionRanges[property] = instructionRange;
 			}
 
 			return instructionRanges;
 		}
 
-		private static Range GetInitializationInstructionRange(TypeDefinition type, PropertyDefinition property)
+		public static Dictionary<PropertyDefinition, Range> InterpretDefaultValuesStatic(this TypeDefinition type, List<PropertyDefinition> propertiesToConvert)
+		{
+			Dictionary<PropertyDefinition, Range> instructionRanges = new Dictionary<PropertyDefinition, Range>();
+
+			foreach (PropertyDefinition property in propertiesToConvert)
+			{
+				Range instructionRange = GetInitializationInstructionsRange(type, property, true);
+				instructionRanges[property] = instructionRange;
+			}
+
+			return instructionRanges;
+		}
+
+		private static Range GetInitializationInstructionsRange(TypeDefinition type, PropertyDefinition property, bool lookInStaticConstructor)
 		{
 			FieldDefinition backingField = type.GetBackingFieldForProperty(property);
 
@@ -39,19 +52,24 @@ namespace Bindables.Fody
 				return null;
 			}
 
-			// We can use any constructor since the same code is injected into all of them.
-			MethodDefinition constructor = type.GetConstructors().First();
+			// For non-static constructors we can use any one of them, since the same code is injected into the all constructors.
+			MethodDefinition constructor = lookInStaticConstructor ? type.GetStaticConstructor() : type.GetConstructors().First();
 			List<Instruction> instructions = constructor.Body.Instructions.ToList();
 
+			return GetInitializationInstructionsRange(instructions, backingField, lookInStaticConstructor ? OpCodes.Stsfld : OpCodes.Stfld);
+		}
+
+		private static Range GetInitializationInstructionsRange(List<Instruction> constructorInstructions, FieldDefinition backingField, OpCode opCodeToLookFor)
+		{
 			int startIndexForCurrentProperty = 0;
 
-			for (int i = 0; i < instructions.Count; i++)
+			for (int i = 0; i < constructorInstructions.Count; i++)
 			{
-				Instruction instruction = instructions[i];
+				Instruction instruction = constructorInstructions[i];
 
-				if (instruction.OpCode == OpCodes.Stfld)
+				if (instruction.OpCode == opCodeToLookFor)
 				{
-					// A stfld instruction means one of these:
+					// A stfld or stsfld instruction means one of these:
 					//   Initializer for a field.
 					//   Initializer for a property. (It might be our property.)
 					//   An explicit statement that sets a field in constructor. (Always after initialization instructions.)
@@ -73,9 +91,9 @@ namespace Bindables.Fody
 			return null;
 		}
 
-		public static void AppendDefaultValueInstructions(this List<Instruction> instructions, TypeDefinition type, PropertyDefinition property, Range instructionRange)
+		public static void AppendDefaultValueInstructionsForDependencyProperty(this List<Instruction> instructions, TypeDefinition type, PropertyDefinition property, Range instructionRange)
 		{
-			MethodDefinition constructor = type.GetConstructors().First();
+			MethodDefinition constructor = type.GetConstructors().First(c => !c.IsStatic);
 
 			if (instructionRange == null)
 			{
@@ -112,6 +130,41 @@ namespace Bindables.Fody
 				: Instruction.Create(OpCodes.Castclass, type.Module.TypeSystem.Object));
 		}
 
+		public static void AppendDefaultValueInstructionsForAttachedProperty(this List<Instruction> instructions, TypeDefinition type, PropertyDefinition property, Range instructionRange)
+		{
+			MethodDefinition constructor = type.GetStaticConstructor();
+
+			if (instructionRange == null)
+			{
+				VariableDefinition variable = instructions.AddInstrunctionForDefaultValue(property);
+
+				if (variable != null)
+				{
+					MethodDefinition staticConstructor = type.GetStaticConstructor();
+
+					staticConstructor.Body.Variables.Add(variable);
+					staticConstructor.Body.InitLocals = true;
+				}
+
+				return;
+			}
+
+			List<Instruction> initializationInstructions = constructor.Body.Instructions.GetRange(instructionRange);
+
+			// The last instruction should be stfld with operand as our backing field.
+			// Remove it as we will get rid of the backing field and just use the default value.
+			initializationInstructions.RemoveAt(initializationInstructions.Count - 1);
+			
+			foreach (Instruction instruction in initializationInstructions)
+			{
+				instructions.Add(instruction);
+			}
+
+			instructions.Add(property.PropertyType.IsValueType
+				? Instruction.Create(OpCodes.Box, property.PropertyType)
+				: Instruction.Create(OpCodes.Castclass, type.Module.TypeSystem.Object));
+		}
+
 		private static VariableDefinition AddInstrunctionForDefaultValue(this List<Instruction> instructions, PropertyDefinition property)
 		{
 			if (!property.PropertyType.IsValueType)
@@ -130,30 +183,20 @@ namespace Bindables.Fody
 			return variable;
 		}
 
-		public static void RemoveInitializationInstructionsFromAllConstructors(this TypeDefinition type, Dictionary<PropertyDefinition, Range> instructionRanges)
+		public static void RemoveInitializationInstructionsFromConstructor(this MethodDefinition constructor, Dictionary<PropertyDefinition, Range> instructionRanges)
 		{
 			List<Range> ranges = instructionRanges.Values.Where(range => range != null).ToList();
 			ranges.Sort();
 
-			MethodDefinition staticConstructor = type.GetStaticConstructor();
+			Collection<Instruction> instructions = constructor.Body.Instructions;
 
-			foreach (MethodDefinition constructor in type.GetConstructors())
+			for (int i = ranges.Count - 1; i >= 0; i--)
 			{
-				if (constructor == staticConstructor)
+				Range range = ranges[i];
+
+				for (int j = range.End; j >= range.Start; j--)
 				{
-					continue;
-				}
-
-				Collection<Instruction> instructions = constructor.Body.Instructions;
-
-				for (int i = ranges.Count - 1; i >= 0; i--)
-				{
-					Range range = ranges[i];
-
-					for (int j = range.End; j >= range.Start; j--)
-					{
-						instructions.RemoveAt(j);
-					}
+					instructions.RemoveAt(j);
 				}
 			}
 		}

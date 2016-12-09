@@ -21,7 +21,10 @@ namespace Bindables.Fody
 			AssemblyNameReference bindablesAssemblyReference = ModuleDefinition.AssemblyReferences.FirstOrDefault(reference => reference.Name == BindablesLibraryName);
 
 			DependencyPropertyWeaver dependencyPropertyWeaver = new DependencyPropertyWeaver(ModuleDefinition);
+			AttachedPropertyWeaver attachedPropertyWeaver = new AttachedPropertyWeaver(ModuleDefinition);
+
 			dependencyPropertyWeaver.Execute();
+			attachedPropertyWeaver.Execute();
 
 			ModuleDefinition.AssemblyReferences.Remove(bindablesAssemblyReference);
 		}
