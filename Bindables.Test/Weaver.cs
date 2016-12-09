@@ -29,7 +29,6 @@ namespace Bindables.Test
 			parameters.ReferencedAssemblies.Add(typeof(DependencyObject).Assembly.Location);
 			parameters.ReferencedAssemblies.Add(typeof(DependencyPropertyAttribute).Assembly.Location);
 			parameters.ReferencedAssemblies.Add(typeof(FrameworkPropertyMetadataOptions).Assembly.Location);
-			parameters.ReferencedAssemblies.Add(typeof(Color).Assembly.Location);
 
 			CSharpCodeProvider codeProvider = CreateCodeProvider();
 
