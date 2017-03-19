@@ -79,7 +79,7 @@ namespace Bindables.Fody
 					return false;
 				}
 
-				if (property.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(ExcludeDependencyPropertyAttribute).FullName))
+				if (property.CustomAttributes.Any(attribute => attribute.AttributeType.Name == nameof(ExcludeDependencyPropertyAttribute)))
 				{
 					return false;
 				}
