@@ -13,6 +13,7 @@ namespace Bindables.Test.Attached
 		private DependencyObject _object;
 
 		private const string Code = @"
+using System;
 using System.Windows;
 using Bindables;
 
@@ -35,6 +36,18 @@ public class PropertyAttribute
 	private static void OnPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
 	{
 		IsCallbackCalled = true;
+	}
+
+	[AttachedProperty]
+	public static int WithEmptyGetterAndSetterMethods { get; set; }
+
+	public static int GetWithEmptyGetterAndSetterMethods(DependencyObject o)
+	{
+		throw new WillBeImplementedByBindablesException();
+	}
+	
+	public static void SetWithEmptyGetterAndSetterMethods(DependencyObject o, int value)
+	{
 	}
 }";
 
@@ -107,6 +120,21 @@ public class PropertyAttribute
 			bool isCallbackCalled = (bool)propertyInfo.GetValue(null);
 
 			Assert.AreEqual(true, isCallbackCalled);
+		}
+
+		[Test]
+		public void ValidateConversionToDependencyPropertyWithEmptyGetterAndSetterMethods()
+		{
+			Type type = _assembly.GetType("PropertyAttribute");
+
+			MethodInfo setter = type.GetMethod("SetWithEmptyGetterAndSetterMethods", new[] { typeof(DependencyObject), typeof(int) });
+			MethodInfo getter = type.GetMethod("GetWithEmptyGetterAndSetterMethods", new[] { typeof(DependencyObject) });
+
+			setter.Invoke(null, new[] { (object)_object, 2 });
+
+			int value = (int)getter.Invoke(null, new[] { (object)_object });
+
+			Assert.AreEqual(2, value);
 		}
 
 		private class WithOptionsViewModel

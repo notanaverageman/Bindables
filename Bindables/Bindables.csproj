@@ -42,6 +42,7 @@
     <Compile Include="DependencyPropertyAttribute.cs" />
     <Compile Include="ExcludeAttachedPropertyAttribute.cs" />
     <Compile Include="ExcludeDependencyPropertyAttribute.cs" />
+    <Compile Include="WillBeImplementedByBindablesException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

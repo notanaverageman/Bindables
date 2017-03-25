@@ -49,10 +49,11 @@ namespace Bindables.Fody
 
 		public static MethodReference ImportConstructor(this ModuleDefinition moduleDefinition, Type type, params Type[] parameterTypes)
 		{
-			TypeReference typeReference = moduleDefinition.ImportReference(type);
-			IEnumerable<MethodReference> constructors = typeReference.Resolve().GetConstructors();
+			TypeDefinition typeDefinition = moduleDefinition.ImportReference(type).Resolve();
+			IEnumerable<MethodReference> constructors = typeDefinition.GetConstructors();
+			TypeDefinition[] parameterTypeDefinitions = parameterTypes.Select(parameterType => moduleDefinition.ImportReference(parameterType).Resolve()).ToArray();
 
-			return GetMethodReference(moduleDefinition, constructors, parameterTypes);
+			return GetMethodReference(moduleDefinition, constructors, parameterTypeDefinitions);
 		}
 
 		public static MethodReference ImportSingleConstructor(this ModuleDefinition moduleDefinition, Type type)
@@ -66,16 +67,18 @@ namespace Bindables.Fody
 		public static MethodReference ImportMethod(this ModuleDefinition moduleDefinition, Type type, string methodName, params Type[] parameterTypes)
 		{
 			TypeDefinition typeDefinition = moduleDefinition.ImportReference(type).Resolve();
-			return ImportMethod(moduleDefinition, typeDefinition, methodName, parameterTypes);
+			TypeReference[] parameterTypeDefinitions = parameterTypes.Select(moduleDefinition.ImportReference).ToArray();
+
+			return ImportMethod(moduleDefinition, typeDefinition, methodName, parameterTypeDefinitions);
 		}
 
-		public static MethodReference ImportMethod(this ModuleDefinition moduleDefinition, TypeDefinition type, string methodName, params Type[] parameterTypes)
+		public static MethodReference ImportMethod(this ModuleDefinition moduleDefinition, TypeDefinition type, string methodName, params TypeReference[] parameterTypes)
 		{
 			IEnumerable<MethodReference> methods = type.Methods.Where(m => m.Name == methodName);
-			return GetMethodReference(moduleDefinition, methods, parameterTypes);
+			return GetMethodReference(moduleDefinition, methods, parameterTypes.Select(x => x.Resolve()).ToArray());
 		}
 
-		private static MethodReference GetMethodReference(ModuleDefinition moduleDefinition, IEnumerable<MethodReference> methods, Type[] parameterTypes)
+		private static MethodReference GetMethodReference(ModuleDefinition moduleDefinition, IEnumerable<MethodReference> methods, TypeDefinition[] parameterTypes)
 		{
 			foreach (MethodReference methodReference in methods)
 			{
@@ -91,9 +94,9 @@ namespace Bindables.Fody
 				for (int i = 0; i < parameters.Count; i++)
 				{
 					ParameterDefinition parameter = parameters[i];
-					Type parameterType = parameterTypes[i];
+					TypeDefinition parameterTypeDefinition = parameterTypes[i];
 
-					if (parameter.ParameterType.FullName != parameterType.FullName)
+					if (parameter.ParameterType.FullName != parameterTypeDefinition.FullName)
 					{
 						allSame = false;
 					}

@@ -96,8 +96,8 @@ namespace Bindables.Fody
 
 			AddInitializationToStaticConstructor(type, property, field, instructionRange, startIndex);
 
-			ModifyGetMethod(property, field);
-			ModifySetMethod(property, field);
+			ModifyGetMethod(type, property, field);
+			ModifySetMethod(type, property, field);
 
 			FieldDefinition backingField = type.GetBackingFieldForProperty(property);
 			type.Fields.Remove(backingField);
@@ -120,16 +120,9 @@ namespace Bindables.Fody
 			}
 		}
 
-		private void ModifyGetMethod(PropertyDefinition property, FieldDefinition field)
+		private void ModifyGetMethod(TypeDefinition type, PropertyDefinition property, FieldDefinition field)
 		{
-			MethodDefinition getter = property.GetMethod;
-
-			getter.Name = getter.Name.Replace("get_", "Get");
-			getter.IsHideBySig = false;
-			getter.IsSpecialName = false;
-
-			ParameterDefinition parameterDefinition = new ParameterDefinition(_dependencyObjectType);
-			getter.Parameters.Add(parameterDefinition);
+			MethodDefinition getter = AcquireGetMethod(type, property);
 
 			Collection<Instruction> getterInstructions = getter.Body.Instructions;
 
@@ -143,16 +136,9 @@ namespace Bindables.Fody
 			getterInstructions.Add(Instruction.Create(OpCodes.Ret));
 		}
 
-		private void ModifySetMethod(PropertyDefinition property, FieldDefinition field)
+		private void ModifySetMethod(TypeDefinition type, PropertyDefinition property, FieldDefinition field)
 		{
-			MethodDefinition setter = property.SetMethod;
-
-			setter.Name = setter.Name.Replace("set_", "Set");
-			setter.IsHideBySig = false;
-			setter.IsSpecialName = false;
-
-			ParameterDefinition parameterDefinition = new ParameterDefinition(_dependencyObjectType);
-			setter.Parameters.Insert(0, parameterDefinition);
+			MethodDefinition setter = AcquireSetMethod(type, property);
 
 			Collection<Instruction> setterInstructions = setter.Body.Instructions;
 
@@ -166,6 +152,130 @@ namespace Bindables.Fody
 			}
 			setterInstructions.Add(Instruction.Create(OpCodes.Callvirt, SetValue));
 			setterInstructions.Add(Instruction.Create(OpCodes.Ret));
+		}
+
+		private MethodDefinition AcquireGetMethod(TypeDefinition type, PropertyDefinition property)
+		{
+			// There are two candidate methods:
+			//   1. The getter of the property.
+			//   2. static T GetProperty(DependencyObject, T value) method.
+			//  
+			// If we have the second method and it has body other than 'throw new WillBeImplementedByBindablesException()'
+			// we will throw an exception. This is to prevent any unexpected behavior since we will overwrite this method's
+			// contents. If the second method exists we will delete the first method as it will cause ambiguity.
+			// 
+			// Otherwise we will change the signature of the getter method to create the second method as the getter will not
+			// (should not) be used in the program.
+
+			MethodDefinition getter = property.GetMethod;
+			MethodDefinition getPropertyMethod = null;
+
+			bool useGetter = false;
+
+			try
+			{
+				getPropertyMethod = ModuleDefinition.ImportMethod(type, "Get" + property.Name, DependencyObjectType).Resolve();
+
+				if (!getPropertyMethod.IsStatic)
+				{
+					throw new WeavingException($"There is a method with signature {getPropertyMethod.FullName}, but it is not static.");
+				}
+
+				string message = $"The method: {getPropertyMethod.FullName} should have only one instruction and it should be: 'throw new WillBeImplementedByBindablesException();'.";
+
+				List<Instruction> bodyInstructions = getPropertyMethod.Body.Instructions.Where(x => x.OpCode != OpCodes.Nop).ToList();
+
+				if (bodyInstructions.Count != 2)
+				{
+					throw new WeavingException(message);
+				}
+
+				MethodReference exceptionConstructor = bodyInstructions[0].Operand as MethodReference;
+
+				bool firstInstructionIsNewobj = bodyInstructions[0].OpCode == OpCodes.Newobj;
+				bool firstInstructionOperandIsWillBeImplementedByBindablesException = exceptionConstructor?.FullName == WillBeImplementedByBindablesExceptionConstructor.FullName;
+				bool secondInstructionIsThrow = bodyInstructions[1].OpCode == OpCodes.Throw;
+
+				if (!firstInstructionIsNewobj || !firstInstructionOperandIsWillBeImplementedByBindablesException || !secondInstructionIsThrow)
+				{
+					throw new WeavingException(message);
+				}
+
+				if (getPropertyMethod.ReturnType != property.PropertyType)
+				{
+					throw new WeavingException($"The method: {getPropertyMethod.FullName} should return {property.PropertyType}.");
+				}
+			}
+			catch (ArgumentException)
+			{
+				useGetter = true;
+			}
+
+			if (useGetter)
+			{
+				getter.Name = getter.Name.Replace("get_", "Get");
+				getter.IsHideBySig = false;
+				getter.IsSpecialName = false;
+
+				ParameterDefinition parameterDefinition = new ParameterDefinition(_dependencyObjectType);
+				getter.Parameters.Add(parameterDefinition);
+
+				return getter;
+			}
+
+			type.Methods.Remove(getter);
+			getPropertyMethod.Body.Instructions.Clear();
+
+			return getPropertyMethod;
+		}
+
+		private MethodDefinition AcquireSetMethod(TypeDefinition type, PropertyDefinition property)
+		{
+			// See the comments on AcquireGetMethod method.
+
+			MethodDefinition setter = property.SetMethod;
+			MethodDefinition setPropertyMethod = null;
+
+			bool useSetter = false;
+
+			try
+			{
+				setPropertyMethod = ModuleDefinition.ImportMethod(type, "Set" + property.Name, DependencyObjectType, property.PropertyType).Resolve();
+
+				if (!setPropertyMethod.IsStatic)
+				{
+					throw new WeavingException($"There is a method with signature {setPropertyMethod.FullName}, but it is not static.");
+				}
+
+				if (setPropertyMethod.Body.Instructions.Any(x => x.OpCode != OpCodes.Nop && x.OpCode != OpCodes.Ret))
+				{
+					throw new WeavingException($"The method: {setPropertyMethod.FullName} should not have any instructions.");
+				}
+
+				if (setPropertyMethod.ReturnType != ModuleDefinition.TypeSystem.Void)
+				{
+					throw new WeavingException($"The method: {setPropertyMethod.FullName} should return void.");
+				}
+			}
+			catch (ArgumentException)
+			{
+				useSetter = true;
+			}
+
+			if (useSetter)
+			{
+				setter.Name = setter.Name.Replace("set_", "Set");
+				setter.IsHideBySig = false;
+				setter.IsSpecialName = false;
+
+				ParameterDefinition parameterDefinition = new ParameterDefinition(_dependencyObjectType);
+				setter.Parameters.Insert(0, parameterDefinition);
+
+				return setter;
+			}
+
+			type.Methods.Remove(setter);
+			return setPropertyMethod;
 		}
 	}
 }

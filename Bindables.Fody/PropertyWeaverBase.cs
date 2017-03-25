@@ -22,7 +22,11 @@ namespace Bindables.Fody
 		protected MethodReference GetValue { get; }
 		protected MethodReference SetValue { get; }
 
+		protected MethodReference WillBeImplementedByBindablesExceptionConstructor { get; }
+
+		protected TypeReference DependencyObjectType { get; }
 		protected TypeReference DependencyPropertyType { get; }
+		protected TypeReference DependencyPropertyChangedEventArgsType { get; }
 
 		protected PropertyWeaverBase(ModuleDefinition moduleDefinition)
 		{
@@ -39,7 +43,11 @@ namespace Bindables.Fody
 			GetValue = moduleDefinition.ImportMethod(typeof(DependencyObject), nameof(DependencyObject.GetValue), typeof(DependencyProperty));
 			SetValue = moduleDefinition.ImportMethod(typeof(DependencyObject), nameof(DependencyObject.SetValue), typeof(DependencyProperty), typeof(object));
 
+			WillBeImplementedByBindablesExceptionConstructor = moduleDefinition.ImportConstructor(typeof(WillBeImplementedByBindablesException));
+
+			DependencyObjectType = moduleDefinition.ImportReference(typeof(DependencyObject));
 			DependencyPropertyType = moduleDefinition.ImportReference(typeof(DependencyProperty));
+			DependencyPropertyChangedEventArgsType = moduleDefinition.ImportReference(typeof(DependencyPropertyChangedEventArgs));
 		}
 
 		public void Execute()
@@ -100,7 +108,7 @@ namespace Bindables.Fody
 					try
 					{
 						// If a method is not found, an ArgumentException will be thrown.
-						MethodReference method = ModuleDefinition.ImportMethod(type, propertyChangedCallback, typeof(DependencyObject), typeof(DependencyPropertyChangedEventArgs));
+						MethodReference method = ModuleDefinition.ImportMethod(type, propertyChangedCallback, DependencyObjectType, DependencyPropertyChangedEventArgsType);
 
 						if (method.HasThis)
 						{
