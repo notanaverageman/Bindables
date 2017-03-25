@@ -87,6 +87,7 @@
     <Compile Include="Attached\PropertyAttributeTests.NonStatic.cs" />
     <Compile Include="Attached\PropertyAttributeTests.NonAuto.cs" />
     <Compile Include="Attached\PropertyAttributeTests.ReadOnly.cs" />
+    <Compile Include="CommonAssemblyInfo.cs" />
     <Compile Include="Dependency\ClassAttributeTests.cs" />
     <Compile Include="Dependency\DefaultValueTests.cs" />
     <Compile Include="Dependency\PropertyAttributeTests.cs" />
@@ -97,6 +98,7 @@
   <ItemGroup>
     <Compile Include="Dependency\PropertyAttributeTests.NonAuto.cs" />
     <Compile Include="Dependency\PropertyAttributeTests.InvalidCallbackMethod.cs" />
+    <Compile Include="Attached\PropertyAttributeTests.InvalidGetterOrSetterMethod.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

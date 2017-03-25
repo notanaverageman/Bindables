@@ -191,9 +191,10 @@ namespace Bindables.Fody
 				}
 
 				MethodReference exceptionConstructor = bodyInstructions[0].Operand as MethodReference;
+				TypeReference exceptionType = exceptionConstructor?.DeclaringType;
 
 				bool firstInstructionIsNewobj = bodyInstructions[0].OpCode == OpCodes.Newobj;
-				bool firstInstructionOperandIsWillBeImplementedByBindablesException = exceptionConstructor?.FullName == WillBeImplementedByBindablesExceptionConstructor.FullName;
+				bool firstInstructionOperandIsWillBeImplementedByBindablesException = exceptionType?.Name == nameof(WillBeImplementedByBindablesException);
 				bool secondInstructionIsThrow = bodyInstructions[1].OpCode == OpCodes.Throw;
 
 				if (!firstInstructionIsNewobj || !firstInstructionOperandIsWillBeImplementedByBindablesException || !secondInstructionIsThrow)

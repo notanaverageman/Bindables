@@ -25,7 +25,7 @@ public class PropertyAttributeNonAuto : DependencyObject
 }";
 
 		[Test]
-		public void ValidateAttributeOnNonAutoPropertyThrowsExecption()
+		public void ValidateAttributeOnNonAutoPropertyThrowsException()
 		{
 			Action action = () => Weaver.Weave(Code);
 			action.ShouldThrow<WeavingException>();
