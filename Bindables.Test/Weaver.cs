@@ -3,7 +3,6 @@ using System.CodeDom.Compiler;
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Media;
 using Bindables.Fody;
 using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
 using Mono.Cecil;
@@ -25,10 +24,11 @@ namespace Bindables.Test
 				OutputAssembly = assemblyName
 			};
 
-			parameters.ReferencedAssemblies.Add("System.dll");
+			parameters.ReferencedAssemblies.Add(typeof(Exception).Assembly.Location);
 			parameters.ReferencedAssemblies.Add(typeof(DependencyObject).Assembly.Location);
 			parameters.ReferencedAssemblies.Add(typeof(DependencyPropertyAttribute).Assembly.Location);
 			parameters.ReferencedAssemblies.Add(typeof(FrameworkPropertyMetadataOptions).Assembly.Location);
+			parameters.ReferencedAssemblies.Add(typeof(WillBeImplementedByBindablesException).Assembly.Location);
 
 			CSharpCodeProvider codeProvider = CreateCodeProvider();
 
