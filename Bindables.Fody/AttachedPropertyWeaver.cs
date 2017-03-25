@@ -11,12 +11,10 @@ namespace Bindables.Fody
 {
 	public class AttachedPropertyWeaver : PropertyWeaverBase
 	{
-		private readonly TypeReference _dependencyObjectType;
 		private readonly MethodReference _registerAttachedProperty;
 
 		public AttachedPropertyWeaver(ModuleDefinition moduleDefinition) : base(moduleDefinition)
 		{
-			_dependencyObjectType = moduleDefinition.ImportReference(typeof(DependencyObject));
 			_registerAttachedProperty = moduleDefinition.ImportMethod(typeof(DependencyProperty), nameof(DependencyProperty.RegisterAttached), typeof(string), typeof(Type), typeof(Type), typeof(PropertyMetadata));
 		}
 
@@ -96,10 +94,14 @@ namespace Bindables.Fody
 
 			AddInitializationToStaticConstructor(type, property, field, instructionRange, startIndex);
 
-			ModifyGetMethod(type, property, field);
-			ModifySetMethod(type, property, field);
+			CreateGetMethod(type, property, field);
+			CreateSetMethod(type, property, field);
 
 			FieldDefinition backingField = type.GetBackingFieldForProperty(property);
+			
+			type.Methods.Remove(property.GetMethod);
+			type.Methods.Remove(property.SetMethod);
+			type.Properties.Remove(property);
 			type.Fields.Remove(backingField);
 		}
 
@@ -120,7 +122,7 @@ namespace Bindables.Fody
 			}
 		}
 
-		private void ModifyGetMethod(TypeDefinition type, PropertyDefinition property, FieldDefinition field)
+		private void CreateGetMethod(TypeDefinition type, PropertyDefinition property, FieldDefinition field)
 		{
 			MethodDefinition getter = AcquireGetMethod(type, property);
 
@@ -136,7 +138,7 @@ namespace Bindables.Fody
 			getterInstructions.Add(Instruction.Create(OpCodes.Ret));
 		}
 
-		private void ModifySetMethod(TypeDefinition type, PropertyDefinition property, FieldDefinition field)
+		private void CreateSetMethod(TypeDefinition type, PropertyDefinition property, FieldDefinition field)
 		{
 			MethodDefinition setter = AcquireSetMethod(type, property);
 
@@ -156,21 +158,12 @@ namespace Bindables.Fody
 
 		private MethodDefinition AcquireGetMethod(TypeDefinition type, PropertyDefinition property)
 		{
-			// There are two candidate methods:
-			//   1. The getter of the property.
-			//   2. static T GetProperty(DependencyObject, T value) method.
-			//  
-			// If we have the second method and it has body other than 'throw new WillBeImplementedByBindablesException()'
+			// If we have the static GetProperty(DependencyObject) method and it has body other than 'throw new WillBeImplementedByBindablesException()'
 			// we will throw an exception. This is to prevent any unexpected behavior since we will overwrite this method's
-			// contents. If the second method exists we will delete the first method as it will cause ambiguity.
-			// 
-			// Otherwise we will change the signature of the getter method to create the second method as the getter will not
-			// (should not) be used in the program.
+			// contents.
+			// We will delete the property's get method here.
 
-			MethodDefinition getter = property.GetMethod;
-			MethodDefinition getPropertyMethod = null;
-
-			bool useGetter = false;
+			MethodDefinition getPropertyMethod;
 
 			try
 			{
@@ -209,22 +202,16 @@ namespace Bindables.Fody
 			}
 			catch (ArgumentException)
 			{
-				useGetter = true;
+				getPropertyMethod = new MethodDefinition("Get" + property.Name, MethodAttributes.Public | MethodAttributes.Static, property.PropertyType)
+				{
+					IsHideBySig = false,
+					IsSpecialName = false
+				};
+				getPropertyMethod.Parameters.Add(new ParameterDefinition(DependencyObjectType));
+
+				type.Methods.Add(getPropertyMethod);
 			}
 
-			if (useGetter)
-			{
-				getter.Name = getter.Name.Replace("get_", "Get");
-				getter.IsHideBySig = false;
-				getter.IsSpecialName = false;
-
-				ParameterDefinition parameterDefinition = new ParameterDefinition(_dependencyObjectType);
-				getter.Parameters.Add(parameterDefinition);
-
-				return getter;
-			}
-
-			type.Methods.Remove(getter);
 			getPropertyMethod.Body.Instructions.Clear();
 
 			return getPropertyMethod;
@@ -235,9 +222,7 @@ namespace Bindables.Fody
 			// See the comments on AcquireGetMethod method.
 
 			MethodDefinition setter = property.SetMethod;
-			MethodDefinition setPropertyMethod = null;
-
-			bool useSetter = false;
+			MethodDefinition setPropertyMethod;
 
 			try
 			{
@@ -260,19 +245,15 @@ namespace Bindables.Fody
 			}
 			catch (ArgumentException)
 			{
-				useSetter = true;
-			}
+				setPropertyMethod = new MethodDefinition("Set" + property.Name, MethodAttributes.Public | MethodAttributes.Static, ModuleDefinition.TypeSystem.Void)
+				{
+					IsHideBySig = false,
+					IsSpecialName = false
+				};
+				setPropertyMethod.Parameters.Add(new ParameterDefinition(DependencyObjectType));
+				setPropertyMethod.Parameters.Add(new ParameterDefinition(property.PropertyType));
 
-			if (useSetter)
-			{
-				setter.Name = setter.Name.Replace("set_", "Set");
-				setter.IsHideBySig = false;
-				setter.IsSpecialName = false;
-
-				ParameterDefinition parameterDefinition = new ParameterDefinition(_dependencyObjectType);
-				setter.Parameters.Insert(0, parameterDefinition);
-
-				return setter;
+				type.Methods.Add(setPropertyMethod);
 			}
 
 			type.Methods.Remove(setter);
