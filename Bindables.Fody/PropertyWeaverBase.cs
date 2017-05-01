@@ -121,7 +121,7 @@ namespace Bindables.Fody
 					{
 						throw new WeavingException($@"No method with signature: ""static void {propertyChangedCallback}({nameof(DependencyObject)}, {nameof(DependencyPropertyChangedEventArgs)})"" found.")
 						{
-							SequencePoint = property.GetMethod.Body.Instructions.First().SequencePoint
+							SequencePoint = property.GetMethod.DebugInformation.SequencePoints.FirstOrDefault()
 						};
 					}
 				}

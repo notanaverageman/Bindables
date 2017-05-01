@@ -36,8 +36,8 @@ namespace Bindables.Test
 			Assert.IsEmpty(compilerResults.Errors);
 
 			using (MemoryStream stream = new MemoryStream())
+			using (ModuleDefinition module = ModuleDefinition.ReadModule(assemblyName, new ReaderParameters { InMemory = true }))
 			{
-				ModuleDefinition module = ModuleDefinition.ReadModule(assemblyName);
 				File.Delete(assemblyName);
 
 				ModuleWeaver weavingTask = new ModuleWeaver

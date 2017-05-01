@@ -26,12 +26,12 @@ public class ClassAttribute
 		set { _nonAuto = value; }
 	}
 
-    public static int ReadOnly { get; }
+	public static int ReadOnly { get; }
 
-    [ExcludeAttachedProperty]
-    public static int Excluded { get; set; }
+	[ExcludeAttachedProperty]
+	public static int Excluded { get; set; }
 
-    public int Instance { get; set; }
+	public int Instance { get; set; }
 	
 	public static string Reference { get; set; }
 	public static int Value { get; set; }
