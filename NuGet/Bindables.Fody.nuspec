@@ -11,8 +11,8 @@
 		<projectUrl>https://github.com/yusuf-gunaydin/Bindables</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 	<iconUrl>https://raw.github.com/yusuf-gunaydin/Bindables/master/Icon.png</iconUrl>
-		<description>Fody add-in for creating dependency properties from auto properties.</description>
-		<tags>Fody WPF XAML DependencyProperty, MVVM, DataBinding, ILWeaving, Cecil</tags>
+		<description>Fody add-in for creating dependency or attached properties from auto properties.</description>
+		<tags>Fody, WPF, XAML, DependencyProperty, AttachedProperty, MVVM, DataBinding, ILWeaving, Cecil</tags>
 		<dependencies>
 			<dependency id="Fody" version="[2, 3)"/>
 		</dependencies>
