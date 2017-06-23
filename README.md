@@ -1,137 +1,92 @@
-## This is an add-in for [Fody](https://github.com/Fody/Fody/) 
+## An add-in for [Fody](https://github.com/Fody/Fody/) to convert regular properties into Dependency or Attached properties. 
 
 ![Bindables Icon](https://raw.github.com/yusuf-gunaydin/Bindables/master/Icon.png)
 
-_Bindables_ converts your auto properties into Wpf dependency properties.  
-Additionally it allows you to set following options while registering the dependency property:
+_Bindables_ converts your auto properties into Wpf dependency or attached properties.  
+Additionally it allows you to set following options:
 
   - Specify a default value.
   - Specify `FrameworkPropertyMetadataOptions`.
   - Specify a `PropertyChangedCallback` method.
-  - Register the dependency property as readonly.
+  - Register the property as readonly.
 
 [![AppVeyor](https://img.shields.io/appveyor/ci/yusuf-gunaydin/bindables.svg)](https://ci.appveyor.com/project/yusuf-gunaydin/bindables)
 [![NuGet](https://img.shields.io/nuget/v/Bindables.Fody.svg)](https://www.nuget.org/packages/Bindables.Fody/)
 
 ## How To Use
 
-You can apply the `DependencyPropertyAttribute` on the class.
-In this case all the auto attributes in that class will be converted to dependency properties.
+### Dependency Property
 
-Non-auto properties and readonly properties will not be touched.  
-You can exclude a property from conversion by applying `ExcludeDependencyPropertyAttribute` on the property.
+You can convert regular properties to dependency properties by applying `DependencyPropertyAttribute` to individual properties or a whole class.
 
-Example:
+When you apply the attribute on a class, all the available properties will be converted to dependency properties. The properties that will __not__ be converted are:
+
+  - Non-auto properties. _(Properties with custom getters and setters.)_
+  - Readonly properties. _(Properties with no setter.)_
+  - Explicitly excluded properties. _(Properties with `[ExcludeDependencyProperty]` attribute.)_
+
+When you apply the attribute on a class, you can further apply it to a property to specify options for that property.
+
+Examples:
 ```c#
 [DependencyProperty]
 public class YourClass : DependencyObject
 {
-    private int _nonAuto;
-    public int NonAuto
-    {
-        get { return _nonAuto; }
-        set { _nonAuto = value; }
-    }
+    public int RegularDependencyProperty { get; set; }
 
-    public int ReadOnly { get; }
+    // Dependency property with FrameworkPropertyMetadataOptions.
+    [DependencyProperty(Options = FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)]
+    public int WithOptions { get; set; }
 
-    [ExcludeDependencyProperty]
-    public int Excluded { get; set; }
-
-    public string Name { get; set; }
-}
-```
-
-What gets compiled:
-```c#
-public class YourClass : DependencyObject
-{
-    private int _nonAuto;
-    public int NonAuto
-    {
-        get { return _nonAuto; }
-        set { _nonAuto = value; }
-    }
-
-    public int ReadOnly { get; }
-    public int Excluded { get; set; }
-
-    public string Name
-    {
-        get { return (string)GetValue(NameProperty); }
-        set { SetValue(NameProperty, value); }
-    }
-    public static readonly DependencyProperty NameProperty = DependencyProperty.Register(
-        nameof(Name),
-        typeof(string),
-        typeof(YourClass),
-        new PropertyMetadata(default(string)));
-}
-```
-
----
-
-You can specify the default value for the dependency property by initializing the auto property with that value.
-
-```c#
-[DependencyProperty]
-public class YourClass : DependencyObject
-{
+    // Dependency property with a default value.
     public string Name { get; set; } = "Default";
+    
+    // Dependency property with PropertyChangedCallback.
+    // This setting expects that a method with signature like below exists in the class.
+    // static void NameOfTheMethod(DependencyObject, DependencyPropertyChangedEventArgs)
+    [DependencyProperty(OnPropertyChanged = nameof(OnPropertyChanged))]
+    public int WithCallback { get; set; }
+    
+    private static void OnPropertyChanged(
+        DependencyObject dependencyObject,
+        DependencyPropertyChangedEventArgs eventArgs)
+    {
+    }
+    
+    // Readonly dependency property. The visibility modifier of the setter can be anything.
+    [DependencyProperty(IsReadOnly = true)]
+    public string ReadOnly { get; private set; }
 }
 ```
 
----
+### Attached Property
 
-You can also apply the `DependencyPropertyAttribute` on individual properties.
-If you prefer this way, you can set following options:
+The same principles with the dependency properties also apply to the attached property conversions. However, there are a few differences:
 
-  - `FrameworkPropertyMetadataOptions` for the dependency property.
-  - `PropertyChangedCallback` method.
-    This setting expects that a method with signature `static void NameOfTheMethod(DependencyObject, DependencyPropertyChangedEventArgs)` exists in the class.
-    ```c#
-    public class PropertyAttribute : DependencyObject
-    {
-        [DependencyProperty(Options = FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)]
-        public int WithOptions { get; set; }
-    
-        [DependencyProperty(OnPropertyChanged = nameof(OnPropertyChanged))]
-        public int WithCallback { get; set; }
-    
-        private static void OnPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
-        {
-        }
-    }
-    ```
-  - `IsReadOnly` to create a readonly dependency property.  
-    Example:
-    ```c#
-    public class YourClass : DependencyObject
-    {
-        [DependencyProperty(IsReadOnly = true)]
-        public string ReadOnly { get; protected set; }
-    }
-    ```
-    What gets compiled:
+  - Use `[AttachedProperty]` instead of `[DependencyProperty]` and `[ExcludeAttachedProperty]` instead of `[ExcludeDependencyProperty]`
+  - Properties must be static in order to be converted to attached properties.
+  - The class containing the attached properties does not have to inherit from DependencyObject.
+  - There should be a getter or setter method stub to make the xaml compiler happy. These methods can also be used explicitly when the attached value for an object has to be gotten or set in the code.
 
-    ```c#
-    public class YourClass : DependencyObject
+```c#
+public class YourClass
+{
+    [AttachedProperty]
+    public static string Name { get; set; }
+
+    public static void GetName(DependencyObject obj)
     {
-        private static readonly DependencyPropertyKey ReadOnlyPropertyKey = DependencyProperty.RegisterReadOnly(
-            "ReadOnlyProperty",
-            typeof(int),
-            typeof(YourClass),
-            new PropertyMetadata(default(int)));
-    
-        public static readonly DependencyProperty ReadOnlyProperty = ReadOnlyPropertyKey.DependencyProperty;
-    
-        public int ReadOnly
-        {
-            get { return (int)GetValue(ReadOnlyProperty); }
-            protected set { SetValue(ReadOnlyPropertyKey, value); }
-        }
+        // This method has to have the only line below.
+        throw new WillBeImplementedByBindablesException();
     }
-    ```
+
+    public static void SetName(DependencyObject obj, string value)
+    {
+        // This method has to be empty.
+    }
+}
+```
+
 
 ## Icon
 
