@@ -74,7 +74,7 @@ public class YourClass
     [AttachedProperty]
     public static string Name { get; set; }
 
-    public static void GetName(DependencyObject obj)
+    public static string GetName(DependencyObject obj)
     {
         // This method has to have the only line below.
         throw new WillBeImplementedByBindablesException();
