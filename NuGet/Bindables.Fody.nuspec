@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata minClientVersion="2.8">
 		<id>Bindables.Fody</id>
@@ -14,7 +14,7 @@
 		<description>Fody add-in for creating dependency or attached properties from auto properties.</description>
 		<tags>Fody, WPF, XAML, DependencyProperty, AttachedProperty, MVVM, DataBinding, ILWeaving, Cecil</tags>
 		<dependencies>
-			<dependency id="Fody" version="[2, 3)"/>
+			<dependency id="Fody" version="[3, 4)"/>
 		</dependencies>
 	</metadata>
 </package>

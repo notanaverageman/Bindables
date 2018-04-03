@@ -1,32 +1,27 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Fody;
 using Mono.Cecil;
 
 namespace Bindables.Fody
 {
-	public class ModuleWeaver
+	public class ModuleWeaver: BaseModuleWeaver
 	{
-		private const string BindablesLibraryName = "Bindables";
-
-		public Action<string> LogInfo { get; set; }
-		public ModuleDefinition ModuleDefinition { get; set; }
-
-		public ModuleWeaver()
+		public override void Execute()
 		{
-			LogInfo = m => { };
-		}
-
-		public void Execute()
-		{
-			AssemblyNameReference bindablesAssemblyReference = ModuleDefinition.AssemblyReferences.FirstOrDefault(reference => reference.Name == BindablesLibraryName);
-
 			DependencyPropertyWeaver dependencyPropertyWeaver = new DependencyPropertyWeaver(ModuleDefinition);
 			AttachedPropertyWeaver attachedPropertyWeaver = new AttachedPropertyWeaver(ModuleDefinition);
 
 			dependencyPropertyWeaver.Execute();
 			attachedPropertyWeaver.Execute();
-
-			ModuleDefinition.AssemblyReferences.Remove(bindablesAssemblyReference);
 		}
+
+		public override IEnumerable<string> GetAssembliesForScanning()
+		{
+			yield break;
+		}
+
+		public override bool ShouldCleanReference => true;
 	}
 }
