@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Fody;
-using Mono.Cecil;
 
 namespace Bindables.Fody
 {

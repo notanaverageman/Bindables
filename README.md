@@ -1,3 +1,4 @@
+
 ## An add-in for [Fody](https://github.com/Fody/Fody/) to convert regular properties into Dependency or Attached properties. 
 
 ![Bindables Icon](https://raw.github.com/yusuf-gunaydin/Bindables/master/Icon.png)
@@ -12,6 +13,14 @@ Additionally it allows you to set following options:
 
 [![AppVeyor](https://img.shields.io/appveyor/ci/yusuf-gunaydin/bindables.svg)](https://ci.appveyor.com/project/yusuf-gunaydin/bindables)
 [![NuGet](https://img.shields.io/nuget/v/Bindables.Fody.svg)](https://www.nuget.org/packages/Bindables.Fody/)
+
+## Version History
+
+You can use the following nuget packages according to your Fody package version. There should be no difference in functionality.
+
+- 0.5.0 -> Fody [3, 4)
+- 0.4.0 -> Fody [2, 3)
+- 0.3.1 -> Fody [1, 2)
 
 ## How To Use
 
