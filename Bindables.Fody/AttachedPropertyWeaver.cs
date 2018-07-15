@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -98,7 +98,7 @@ namespace Bindables.Fody
 			CreateSetMethod(type, property, field);
 
 			FieldDefinition backingField = type.GetBackingFieldForProperty(property);
-			
+
 			type.Methods.Remove(property.GetMethod);
 			type.Methods.Remove(property.SetMethod);
 			type.Properties.Remove(property);
@@ -195,7 +195,7 @@ namespace Bindables.Fody
 					throw new WeavingException(message);
 				}
 
-				if (getPropertyMethod.ReturnType != property.PropertyType)
+				if (!AreTypesEqual(getPropertyMethod.ReturnType, property.PropertyType))
 				{
 					throw new WeavingException($"The method: {getPropertyMethod.FullName} should return {property.PropertyType}.");
 				}
@@ -258,6 +258,19 @@ namespace Bindables.Fody
 
 			type.Methods.Remove(setter);
 			return setPropertyMethod;
+		}
+
+		private bool AreTypesEqual(TypeReference first, TypeReference second)
+		{
+			if (first.IsArray && second.IsArray)
+			{
+				ArrayType firstArray = (ArrayType)first;
+				ArrayType secondArray = (ArrayType)second;
+
+				return firstArray.ElementType == secondArray.ElementType;
+			}
+
+			return first == second;
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
@@ -47,6 +47,18 @@ public class PropertyAttribute
 	}
 	
 	public static void SetWithEmptyGetterAndSetterMethods(DependencyObject o, int value)
+	{
+	}
+
+	[AttachedProperty]
+	public static byte[] ByteArray { get; set; }
+
+	public static byte[] GetByteArray(DependencyObject o)
+	{
+		throw new WillBeImplementedByBindablesException();
+	}
+	
+	public static void SetByteArray(DependencyObject o, byte[] value)
 	{
 	}
 }";
