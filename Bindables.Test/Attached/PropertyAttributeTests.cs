@@ -19,7 +19,8 @@ using Bindables;
 
 public class PropertyAttribute
 {
-	public static bool IsCallbackCalled { get; set; }
+	public static bool IsPropertyChangedCallbackCalled { get; set; }
+	public static bool IsCoerceValueCallbackCalled { get; set; }
 
 	[AttachedProperty]
 	public static string Reference { get; set; }
@@ -30,12 +31,18 @@ public class PropertyAttribute
 	[AttachedProperty(Options = FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)]
 	public static int WithOptions { get; set; }
 
-	[AttachedProperty(OnPropertyChanged = nameof(OnPropertyChanged))]
-	public static int PropertyChangedCallback { get; set; }
+	[AttachedProperty(OnPropertyChanged = nameof(OnPropertyChanged), OnCoerceValue = nameof(OnCoerceValue))]
+	public static int Callback { get; set; }
 
 	private static void OnPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
 	{
-		IsCallbackCalled = true;
+		IsPropertyChangedCallbackCalled = true;
+	}
+
+	private static object OnCoerceValue(DependencyObject dependencyObject, object value)
+	{
+		IsCoerceValueCallbackCalled = true;
+		return value;
 	}
 
 	[AttachedProperty]
@@ -125,13 +132,17 @@ public class PropertyAttribute
 		{
 			Type type = _assembly.GetType("PropertyAttribute");
 
-			DependencyProperty valueProperty = (DependencyProperty)type.GetField("PropertyChangedCallbackProperty").GetValue(null);
-			_object.SetValue(valueProperty, 1);
+			DependencyProperty callbackProperty = (DependencyProperty)type.GetField("CallbackProperty").GetValue(null);
+			_object.SetValue(callbackProperty, 1);
 			
-			PropertyInfo propertyInfo = type.GetProperty("IsCallbackCalled");
-			bool isCallbackCalled = (bool)propertyInfo.GetValue(null);
+			PropertyInfo propertyChangedCallbackPropertyInfo = type.GetProperty("IsPropertyChangedCallbackCalled");
+			bool isPropertyChangedCallbackCalled = (bool)propertyChangedCallbackPropertyInfo.GetValue(null);
+			
+			PropertyInfo coerceValueCallbackPropertyInfo = type.GetProperty("IsCoerceValueCallbackCalled");
+			bool isCoerceValueCallbackCalled = (bool)coerceValueCallbackPropertyInfo.GetValue(null);
 
-			Assert.AreEqual(true, isCallbackCalled);
+			Assert.AreEqual(true, isPropertyChangedCallbackCalled);
+			Assert.AreEqual(true, isCoerceValueCallbackCalled);
 		}
 
 		[Test]

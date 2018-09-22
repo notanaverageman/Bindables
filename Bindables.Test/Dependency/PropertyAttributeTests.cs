@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
@@ -17,7 +17,8 @@ using Bindables;
 
 public class PropertyAttribute : DependencyObject
 {
-	public static bool IsCallbackCalled { get; set; }
+	public static bool IsPropertyChangedCallbackCalled { get; set; }
+	public static bool IsCoerceValueCallbackCalled { get; set; }
 
 	[DependencyProperty]
 	public string Reference { get; set; }
@@ -28,12 +29,18 @@ public class PropertyAttribute : DependencyObject
 	[DependencyProperty(Options = FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)]
 	public int WithOptions { get; set; }
 
-	[DependencyProperty(OnPropertyChanged = nameof(OnPropertyChanged))]
-	public int PropertyChangedCallback { get; set; }
+	[DependencyProperty(OnPropertyChanged = nameof(OnPropertyChanged), OnCoerceValue = nameof(OnCoerceValue))]
+	public int Callback { get; set; }
 
 	private static void OnPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
 	{
-		IsCallbackCalled = true;
+		IsPropertyChangedCallbackCalled = true;
+	}
+
+	private static object OnCoerceValue(DependencyObject dependencyObject, object value)
+	{
+		IsCoerceValueCallbackCalled = true;
+		return value;
 	}
 }";
 
@@ -101,17 +108,21 @@ public class PropertyAttribute : DependencyObject
 		}
 
 		[Test]
-		public void ValidateConversionToDependencyPropertyWithPropertyChangedCallback()
+		public void ValidateConversionToDependencyPropertyWithCallbacks()
 		{
 			Type type = _assembly.GetType("PropertyAttribute");
 
 			dynamic instance = Activator.CreateInstance(type);
-			instance.PropertyChangedCallback = 2;
+			instance.Callback = 2;
 
-			PropertyInfo propertyInfo = type.GetProperty("IsCallbackCalled");
-			bool isCallbackCalled = (bool)propertyInfo.GetValue(null);
+			PropertyInfo propertyChangedCallbackPropertyInfo = type.GetProperty("IsPropertyChangedCallbackCalled");
+			bool isPropertyChangedCallbackCalled = (bool)propertyChangedCallbackPropertyInfo.GetValue(null);
 
-			Assert.AreEqual(true, isCallbackCalled);
+			PropertyInfo coerceValueCallbackPropertyInfo = type.GetProperty("IsCoerceValueCallbackCalled");
+			bool isCoerceValueCallbackCalled = (bool)coerceValueCallbackPropertyInfo.GetValue(null);
+			
+			Assert.AreEqual(true, isPropertyChangedCallbackCalled);
+			Assert.AreEqual(true, isCoerceValueCallbackCalled);
 		}
 
 		private class WithOptionsViewModel

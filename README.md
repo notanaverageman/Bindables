@@ -14,14 +14,6 @@ Additionally it allows you to set following options:
 [![AppVeyor](https://img.shields.io/appveyor/ci/yusuf-gunaydin/bindables.svg)](https://ci.appveyor.com/project/yusuf-gunaydin/bindables)
 [![NuGet](https://img.shields.io/nuget/v/Bindables.Fody.svg)](https://www.nuget.org/packages/Bindables.Fody/)
 
-## Version History
-
-You can use the following nuget packages according to your Fody package version. There should be no difference in functionality.
-
-- 0.5.0 -> Fody [3, 4)
-- 0.4.0 -> Fody [2, 3)
-- 0.3.1 -> Fody [1, 2)
-
 ## How To Use
 
 ### Dependency Property
@@ -54,12 +46,26 @@ public class YourClass : DependencyObject
     // This setting expects that a method with signature like below exists in the class.
     // static void NameOfTheMethod(DependencyObject, DependencyPropertyChangedEventArgs)
     [DependencyProperty(OnPropertyChanged = nameof(OnPropertyChanged))]
-    public int WithCallback { get; set; }
+    public int WithPropertyChangedCallback { get; set; }
     
     private static void OnPropertyChanged(
         DependencyObject dependencyObject,
         DependencyPropertyChangedEventArgs eventArgs)
     {
+    }
+    
+    // Dependency property with CoerceValueCallback.
+    // This setting expects that a method with signature like below exists in the class.
+    // static object NameOfTheMethod(DependencyObject, object)
+    // You have to provide OnPropertyChanged along with OnCoerceValue. Otherwise a compiler error will be generated.
+    [DependencyProperty(OnPropertyChanged = nameof(OnPropertyChanged), OnCoerceValue = nameof(OnCoerceValue))]
+    public int WithCoerceValueCallback { get; set; }
+    
+    private static void OnCoerceValue(
+        DependencyObject dependencyObject,
+        object value)
+    {
+        return value;
     }
     
     // Readonly dependency property. The visibility modifier of the setter can be anything.
@@ -95,7 +101,6 @@ public class YourClass
     }
 }
 ```
-
 
 ## Icon
 

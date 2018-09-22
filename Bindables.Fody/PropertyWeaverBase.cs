@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
@@ -14,14 +14,17 @@ namespace Bindables.Fody
 		protected MethodReference GetTypeFromHandle { get; }
 
 		protected MethodReference PropertyChangedCallbackConstructor { get; }
+		protected MethodReference CoerceValueCallbackConstructor { get; }
 
 		protected MethodReference FrameworkPropertyMetadataConstructor { get; }
 		protected MethodReference FrameworkPropertyMetadataConstructorWithOptions { get; }
 		protected MethodReference FrameworkPropertyMetadataConstructorWithOptionsAndPropertyChangedCallback { get; }
+		protected MethodReference FrameworkPropertyMetadataConstructorWithOptionsPropertyChangedCallbackAndCoerceValueCallback { get; }
 
 		protected MethodReference GetValue { get; }
 		protected MethodReference SetValue { get; }
 
+		protected TypeReference ObjectType { get; }
 		protected TypeReference DependencyObjectType { get; }
 		protected TypeReference DependencyPropertyType { get; }
 		protected TypeReference DependencyPropertyChangedEventArgsType { get; }
@@ -33,14 +36,17 @@ namespace Bindables.Fody
 			GetTypeFromHandle = moduleDefinition.ImportMethod(typeof(Type), nameof(Type.GetTypeFromHandle), typeof(RuntimeTypeHandle));
 
 			PropertyChangedCallbackConstructor = moduleDefinition.ImportSingleConstructor(typeof(PropertyChangedCallback));
+			CoerceValueCallbackConstructor = moduleDefinition.ImportSingleConstructor(typeof(CoerceValueCallback));
 
 			FrameworkPropertyMetadataConstructor = moduleDefinition.ImportConstructor(typeof(FrameworkPropertyMetadata), typeof(object));
 			FrameworkPropertyMetadataConstructorWithOptions = moduleDefinition.ImportConstructor(typeof(FrameworkPropertyMetadata), typeof(object), typeof(FrameworkPropertyMetadataOptions));
 			FrameworkPropertyMetadataConstructorWithOptionsAndPropertyChangedCallback = moduleDefinition.ImportConstructor(typeof(FrameworkPropertyMetadata), typeof(object), typeof(FrameworkPropertyMetadataOptions), typeof(PropertyChangedCallback));
+			FrameworkPropertyMetadataConstructorWithOptionsPropertyChangedCallbackAndCoerceValueCallback = moduleDefinition.ImportConstructor(typeof(FrameworkPropertyMetadata), typeof(object), typeof(FrameworkPropertyMetadataOptions), typeof(PropertyChangedCallback), typeof(CoerceValueCallback));
 
 			GetValue = moduleDefinition.ImportMethod(typeof(DependencyObject), nameof(DependencyObject.GetValue), typeof(DependencyProperty));
 			SetValue = moduleDefinition.ImportMethod(typeof(DependencyObject), nameof(DependencyObject.SetValue), typeof(DependencyProperty), typeof(object));
 
+			ObjectType = moduleDefinition.ImportReference(typeof(object));
 			DependencyObjectType = moduleDefinition.ImportReference(typeof(DependencyObject));
 			DependencyPropertyType = moduleDefinition.ImportReference(typeof(DependencyProperty));
 			DependencyPropertyChangedEventArgsType = moduleDefinition.ImportReference(typeof(DependencyPropertyChangedEventArgs));
@@ -95,36 +101,37 @@ namespace Bindables.Fody
 					: Instruction.Create(OpCodes.Ldc_I4, (int)options.Value));
 
 				string propertyChangedCallback = attribute.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.OnPropertyChanged)).Argument.Value as string;
-				if (String.IsNullOrEmpty(propertyChangedCallback))
-				{
-					instructions.Add(Instruction.Create(OpCodes.Newobj, FrameworkPropertyMetadataConstructorWithOptions));
-				}
-				else
-				{
-					try
-					{
-						// If a method is not found, an ArgumentException will be thrown.
-						MethodReference method = ModuleDefinition.ImportMethod(type, propertyChangedCallback, DependencyObjectType, DependencyPropertyChangedEventArgsType);
+				bool hasPropertyChangedCallback = !String.IsNullOrEmpty(propertyChangedCallback);
 
-						if (method.HasThis)
-						{
-							// Found a method with desired signature, but it is not static.
-							throw new ArgumentException();
-						}
+				string coerceValueCallback = attribute.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.OnCoerceValue)).Argument.Value as string;
+				bool hasCoerceValueCallback = !String.IsNullOrEmpty(coerceValueCallback);
 
-						instructions.Add(Instruction.Create(OpCodes.Ldnull));
-						instructions.Add(Instruction.Create(OpCodes.Ldftn, method));
-						instructions.Add(Instruction.Create(OpCodes.Newobj, PropertyChangedCallbackConstructor));
-						instructions.Add(Instruction.Create(OpCodes.Newobj, FrameworkPropertyMetadataConstructorWithOptionsAndPropertyChangedCallback));
-					}
-					catch (ArgumentException)
+				if (hasCoerceValueCallback && !hasPropertyChangedCallback)
+				{
+					throw new WeavingException($@"{nameof(DependencyPropertyAttribute.OnPropertyChanged)} should also be defined if {nameof(DependencyPropertyAttribute.OnCoerceValue)} is defined.")
 					{
-						throw new WeavingException($@"No method with signature: ""static void {propertyChangedCallback}({nameof(DependencyObject)}, {nameof(DependencyPropertyChangedEventArgs)})"" found.")
-						{
-							SequencePoint = property.GetMethod.DebugInformation.SequencePoints.FirstOrDefault()
-						};
-					}
+						SequencePoint = property.GetMethod.DebugInformation.SequencePoints.FirstOrDefault()
+					};
 				}
+
+				if (hasPropertyChangedCallback)
+				{
+					AddPropertyChangedCallbackInstructions(type, property, propertyChangedCallback, instructions);
+				}
+
+				if (hasCoerceValueCallback)
+				{
+					AddCoerceValueCallbackInstructions(type, property, coerceValueCallback, instructions);
+				}
+
+				Instruction constructor =
+					hasPropertyChangedCallback
+					? hasCoerceValueCallback
+						? Instruction.Create(OpCodes.Newobj, FrameworkPropertyMetadataConstructorWithOptionsPropertyChangedCallbackAndCoerceValueCallback)
+						: Instruction.Create(OpCodes.Newobj, FrameworkPropertyMetadataConstructorWithOptionsAndPropertyChangedCallback)
+					: Instruction.Create(OpCodes.Newobj, FrameworkPropertyMetadataConstructorWithOptions);
+
+				instructions.Add(constructor);
 			}
 			else
 			{
@@ -132,6 +139,58 @@ namespace Bindables.Fody
 			}
 
 			return instructions;
+		}
+
+		private void AddPropertyChangedCallbackInstructions(TypeDefinition type, PropertyDefinition property, string propertyChangedCallback, List<Instruction> instructions)
+		{
+			try
+			{
+				// If a method is not found, an ArgumentException will be thrown.
+				MethodReference method = ModuleDefinition.ImportMethod(type, propertyChangedCallback, DependencyObjectType, DependencyPropertyChangedEventArgsType);
+
+				if (method.HasThis)
+				{
+					// Found a method with desired signature, but it is not static.
+					throw new ArgumentException();
+				}
+
+				instructions.Add(Instruction.Create(OpCodes.Ldnull));
+				instructions.Add(Instruction.Create(OpCodes.Ldftn, method));
+				instructions.Add(Instruction.Create(OpCodes.Newobj, PropertyChangedCallbackConstructor));
+			}
+			catch (ArgumentException)
+			{
+				throw new WeavingException($@"No method with signature: ""static void {propertyChangedCallback}({nameof(DependencyObject)}, {nameof(DependencyPropertyChangedEventArgs)})"" found.")
+				{
+					SequencePoint = property.GetMethod.DebugInformation.SequencePoints.FirstOrDefault()
+				};
+			}
+		}
+
+		private void AddCoerceValueCallbackInstructions(TypeDefinition type, PropertyDefinition property, string coerceValueCallback, List<Instruction> instructions)
+		{
+			try
+			{
+				// If a method is not found, an ArgumentException will be thrown.
+				MethodReference method = ModuleDefinition.ImportMethod(type, coerceValueCallback, DependencyObjectType, ObjectType);
+
+				if (method.HasThis)
+				{
+					// Found a method with desired signature, but it is not static.
+					throw new ArgumentException();
+				}
+
+				instructions.Add(Instruction.Create(OpCodes.Ldnull));
+				instructions.Add(Instruction.Create(OpCodes.Ldftn, method));
+				instructions.Add(Instruction.Create(OpCodes.Newobj, CoerceValueCallbackConstructor));
+			}
+			catch (ArgumentException)
+			{
+				throw new WeavingException($@"No method with signature: ""static object {coerceValueCallback}({nameof(DependencyObject)}, object)"" found.")
+				{
+					SequencePoint = property.GetMethod.DebugInformation.SequencePoints.FirstOrDefault()
+				};
+			}
 		}
 
 		protected abstract void ExecuteInternal(TypeDefinition type, List<PropertyDefinition> propertiesToConvert);

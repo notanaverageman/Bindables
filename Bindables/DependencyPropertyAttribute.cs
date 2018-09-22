@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 
 namespace Bindables
@@ -8,6 +8,7 @@ namespace Bindables
 	{
 		public FrameworkPropertyMetadataOptions Options { get; set; }
 		public string OnPropertyChanged { get; set; }
+		public string OnCoerceValue { get; set; }
 		public bool IsReadOnly { get; set; }
 	}
 }
