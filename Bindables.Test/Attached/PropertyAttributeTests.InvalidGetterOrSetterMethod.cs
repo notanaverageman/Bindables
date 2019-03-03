@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Bindables.Fody;
 using FluentAssertions;
 using NUnit.Framework;
@@ -73,28 +73,28 @@ public class PropertyAttributeInvalidCallbackMethod
 		public void ValidateAttributeWithInvalidGetterMethodReturnTypeThrowsExecption()
 		{
 			Action action = () => Weaver.Weave(InvalidGetterReturnType);
-			action.ShouldThrow<WeavingException>();
+			action.Should().Throw<WeavingException>();
 		}
 
 		[Test]
 		public void ValidateAttributeWithInvalidGetterMethodBodyThrowsExecption()
 		{
 			Action action = () => Weaver.Weave(InvalidGetterBody);
-			action.ShouldThrow<WeavingException>();
+			action.Should().Throw<WeavingException>();
 		}
 
 		[Test]
 		public void ValidateAttributeWithInvalidSetterMethodReturnTypeThrowsExecption()
 		{
 			Action action = () => Weaver.Weave(InvalidSetterReturnType);
-			action.ShouldThrow<WeavingException>();
+			action.Should().Throw<WeavingException>();
 		}
 
 		[Test]
 		public void ValidateAttributeWithInvalidSetterMethodBodyThrowsExecption()
 		{
 			Action action = () => Weaver.Weave(InvalidSetterBody);
-			action.ShouldThrow<WeavingException>();
+			action.Should().Throw<WeavingException>();
 		}
 	}
 }

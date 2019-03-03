@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Bindables.Fody;
 using FluentAssertions;
 using NUnit.Framework;
@@ -28,7 +28,7 @@ public class PropertyAttributeNonAuto
 		public void ValidateAttributeOnNonAutoPropertyThrowsExecption()
 		{
 			Action action = () => Weaver.Weave(Code);
-			action.ShouldThrow<WeavingException>();
+			action.Should().Throw<WeavingException>();
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
@@ -114,6 +114,16 @@ namespace Bindables.Fody
 		public static FieldDefinition GetBackingFieldForProperty(this TypeDefinition type, PropertyDefinition property)
 		{
 			return type.Fields.FirstOrDefault(f => f.Name == $"<{property.Name}>k__BackingField" && f.FieldType.FullName == property.PropertyType.FullName);
+		}
+
+		public static TypeReference GetGenericTypeReferenceOrSelf(this TypeDefinition type)
+		{
+			if (type.HasGenericParameters)
+			{
+				return type.MakeGenericInstanceType(type.GenericParameters.Select(x => x.GetElementType()).ToArray());
+			}
+
+			return type;
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.CodeDom.Compiler;
 using System.IO;
 using System.Reflection;
@@ -21,7 +21,8 @@ namespace Bindables.Test
 			CompilerParameters parameters = new CompilerParameters
 			{
 				GenerateExecutable = false,
-				OutputAssembly = assemblyName
+				OutputAssembly = assemblyName,
+				
 			};
 
 			parameters.ReferencedAssemblies.Add(typeof(Exception).Assembly.Location);
@@ -29,7 +30,7 @@ namespace Bindables.Test
 			parameters.ReferencedAssemblies.Add(typeof(DependencyPropertyAttribute).Assembly.Location);
 			parameters.ReferencedAssemblies.Add(typeof(FrameworkPropertyMetadataOptions).Assembly.Location);
 
-			CSharpCodeProvider codeProvider = CreateCodeProvider();
+			CodeDomProvider codeProvider = CreateCodeProvider();
 
 			CompilerResults compilerResults = codeProvider.CompileAssemblyFromSource(parameters, code);
 
@@ -49,11 +50,17 @@ namespace Bindables.Test
 				module.Write(stream);
 				stream.Seek(0, SeekOrigin.Begin);
 
+				using (FileStream fileStream = File.Create($"{Guid.NewGuid()}.dll"))
+				{
+					stream.CopyToAsync(fileStream);
+					stream.Seek(0, SeekOrigin.Begin);
+				}
+
 				return Assembly.Load(stream.ToArray());
 			}
 		}
 
-		private static CSharpCodeProvider CreateCodeProvider()
+		private static CodeDomProvider CreateCodeProvider()
 		{
 			CSharpCodeProvider codeProvider = new CSharpCodeProvider();
 

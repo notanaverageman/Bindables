@@ -4,6 +4,7 @@ using System.Linq;
 using Mono.Cecil;
 using System.Windows;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
 
 namespace Bindables.Fody
 {
@@ -72,7 +73,7 @@ namespace Bindables.Fody
 				{
 					continue;
 				}
-
+				
 				type.CreateStaticConstructorIfNotExists();
 				ExecuteInternal(type, propertiesToConvert);
 				type.RemoveBindableAttributes();
@@ -86,7 +87,7 @@ namespace Bindables.Fody
 				Instruction.Create(OpCodes.Ldstr, property.Name),
 				Instruction.Create(OpCodes.Ldtoken, property.PropertyType),
 				Instruction.Create(OpCodes.Call, GetTypeFromHandle),
-				Instruction.Create(OpCodes.Ldtoken, type),
+				Instruction.Create(OpCodes.Ldtoken, type.GetGenericTypeReferenceOrSelf()),
 				Instruction.Create(OpCodes.Call, GetTypeFromHandle)
 			};
 

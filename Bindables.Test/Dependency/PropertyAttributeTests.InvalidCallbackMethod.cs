@@ -62,21 +62,21 @@ public class PropertyAttributeInvalidCallbackMethod : DependencyObject
 		public void ValidateAttributeWithInvalidPropertyChangedCallbackMethodThrowsExecption()
 		{
 			Action action = () => Weaver.Weave(PropertyChangedCode);
-			action.ShouldThrow<WeavingException>();
+			action.Should().Throw<WeavingException>();
 		}
 
 		[Test]
 		public void ValidateAttributeWithInvalidCoerceValueCallbackMethodThrowsExecption()
 		{
 			Action action = () => Weaver.Weave(CoerceValueCode);
-			action.ShouldThrow<WeavingException>();
+			action.Should().Throw<WeavingException>();
 		}
 
 		[Test]
 		public void ValidateAttributeWithMissingPropertyChangedCallbackMethodThrowsExecption()
 		{
 			Action action = () => Weaver.Weave(MissingPropertyChangedCode);
-			action.ShouldThrow<WeavingException>();
+			action.Should().Throw<WeavingException>();
 		}
 	}
 }

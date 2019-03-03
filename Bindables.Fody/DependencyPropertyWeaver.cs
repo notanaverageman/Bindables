@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -98,7 +98,7 @@ namespace Bindables.Fody
 			if (property.IsMarkedAsReadOnly())
 			{
 				string dependencyPropertyKeyFieldName = property.Name + "PropertyKey";
-				FieldDefinition dependencyPropertyKeyField = new FieldDefinition(dependencyPropertyKeyFieldName, FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.Private, _dependencyPropertyKey);
+				FieldDefinition dependencyPropertyKeyField = new FieldDefinition(dependencyPropertyKeyFieldName, FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.Private, _dependencyPropertyKey){};
 
 				type.Fields.Add(dependencyPropertyKeyField);
 
