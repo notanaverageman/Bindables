@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <PackageId Condition="'$(PackageId)' == ''">$(MSBuildProjectName).Fody</PackageId>
-    <PackageTags Condition="'$(PackageTags)' == ''">ILWeaving, Fody, Cecil, AOP</PackageTags>
+    <PackageTags Condition="'$(PackageTags)' == ''">ILWeaving, Fody, Cecil, AOP, WPF, XAML, DependencyProperty, AttachedProperty, DataBinding</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TargetsForTfmSpecificContentInPackage Condition="'$(SkipPackagingDefaultFiles)' != 'true'">$(TargetsForTfmSpecificContentInPackage);IncludeFodyFiles</TargetsForTfmSpecificContentInPackage>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

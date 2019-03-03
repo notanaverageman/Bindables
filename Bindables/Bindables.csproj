@@ -6,6 +6,7 @@
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
     <Authors>Yusuf Tarık Günaydın</Authors>
+    <Description>Fody add-in for creating dependency or attached properties from auto properties.</Description>
     <PackageOutputPath>$(SolutionDir)nugets</PackageOutputPath>
     <PackageIconUrl>https://github.com/yusuf-gunaydin/Bindables/raw/master/Icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/yusuf-gunaydin/Bindables</PackageProjectUrl>
