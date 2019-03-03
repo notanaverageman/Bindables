@@ -1,10 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="FodyPackaging.props" />
   <Import Project="FodyPackaging.targets" />
 
   <PropertyGroup>
-    <TargetFrameworks>net452</TargetFrameworks>
+    <TargetFramework>net452</TargetFramework>
     <Authors>Yusuf Tarık Günaydın</Authors>
     <PackageOutputPath>$(SolutionDir)nugets</PackageOutputPath>
     <PackageIconUrl>https://github.com/yusuf-gunaydin/Bindables/raw/master/Icon.png</PackageIconUrl>
