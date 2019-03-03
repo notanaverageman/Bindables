@@ -1,19 +1,8 @@
-configuration: Release
-
-# restore NuGet packages before running MSBuild
-before_build:
-  - nuget restore
-
-# package Web Application project for Web Deploy
-build:
-  verbosity: minimal
-  
-artifacts: 
-  - path: NugetBuild\*.nupkg
-    name: package
-  
-deploy:
-  provider: NuGet
-  api_key:
-    secure: gJjiKj19G/rC0+Y/TsQMN1g79wL3npIASi5JDbv3/Zxc7vX5rQHBTpdPvLqfqkjI
-  artifact: package
+image: Visual Studio 2017
+build_script:
+- cmd: dotnet build --configuration Release
+test:
+  assemblies:
+    - '**\*Tests.dll'
+artifacts:
+- path: nugets\*.nupkg

@@ -1,5 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="FodyPackaging.props" />
+  <Import Project="FodyPackaging.targets" />
+
   <PropertyGroup>
     <TargetFrameworks>net452</TargetFrameworks>
     <Authors>Yusuf Tarık Günaydın</Authors>
