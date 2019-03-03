@@ -1,8 +1,15 @@
 image: Visual Studio 2017
-build_script:
-- cmd: dotnet build --configuration Release
+configuration: Release
+
+before_build:
+  - nuget restore
+
+build:
+  verbosity: minimal
+
 test:
   assemblies:
     - '**\*Tests.dll'
+
 artifacts:
 - path: nugets\*.nupkg
