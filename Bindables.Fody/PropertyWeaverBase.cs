@@ -4,7 +4,6 @@ using System.Linq;
 using Mono.Cecil;
 using System.Windows;
 using Mono.Cecil.Cil;
-using Mono.Cecil.Rocks;
 
 namespace Bindables.Fody
 {
@@ -95,21 +94,21 @@ namespace Bindables.Fody
 			
 			if (attribute?.HasProperties == true)
 			{
-				CustomAttributeArgument options = attribute.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.Options)).Argument;
+				CustomAttributeArgument options = attribute.Properties.FirstOrDefault(p => p.Name == Consts.Options).Argument;
 
 				instructions.Add(options.Value == null
 					? Instruction.Create(OpCodes.Ldc_I4, (int)FrameworkPropertyMetadataOptions.None)
 					: Instruction.Create(OpCodes.Ldc_I4, (int)options.Value));
 
-				string propertyChangedCallback = attribute.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.OnPropertyChanged)).Argument.Value as string;
+				string propertyChangedCallback = attribute.Properties.FirstOrDefault(p => p.Name == Consts.OnPropertyChanged).Argument.Value as string;
 				bool hasPropertyChangedCallback = !String.IsNullOrEmpty(propertyChangedCallback);
 
-				string coerceValueCallback = attribute.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.OnCoerceValue)).Argument.Value as string;
+				string coerceValueCallback = attribute.Properties.FirstOrDefault(p => p.Name == Consts.OnCoerceValue).Argument.Value as string;
 				bool hasCoerceValueCallback = !String.IsNullOrEmpty(coerceValueCallback);
 
 				if (hasCoerceValueCallback && !hasPropertyChangedCallback)
 				{
-					throw new WeavingException($@"{nameof(DependencyPropertyAttribute.OnPropertyChanged)} should also be defined if {nameof(DependencyPropertyAttribute.OnCoerceValue)} is defined.")
+					throw new WeavingException($@"{Consts.OnPropertyChanged} should also be defined if {Consts.OnCoerceValue} is defined.")
 					{
 						SequencePoint = property.GetMethod.DebugInformation.SequencePoints.FirstOrDefault()
 					};

@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFrameworks>net472</TargetFrameworks>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <DisableFody>true</DisableFody>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />

@@ -79,7 +79,7 @@ namespace Bindables.Fody
 					return false;
 				}
 
-				if (property.CustomAttributes.Any(attribute => attribute.AttributeType.Name == nameof(ExcludeDependencyPropertyAttribute)))
+				if (property.CustomAttributes.Any(attribute => attribute.AttributeType.Name == Consts.ExcludeDependencyPropertyAttribute))
 				{
 					return false;
 				}
@@ -98,7 +98,7 @@ namespace Bindables.Fody
 			if (property.IsMarkedAsReadOnly())
 			{
 				string dependencyPropertyKeyFieldName = property.Name + "PropertyKey";
-				FieldDefinition dependencyPropertyKeyField = new FieldDefinition(dependencyPropertyKeyFieldName, FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.Private, _dependencyPropertyKey){};
+				FieldDefinition dependencyPropertyKeyField = new FieldDefinition(dependencyPropertyKeyFieldName, FieldAttributes.Static | FieldAttributes.InitOnly | FieldAttributes.Private, _dependencyPropertyKey);
 
 				type.Fields.Add(dependencyPropertyKeyField);
 

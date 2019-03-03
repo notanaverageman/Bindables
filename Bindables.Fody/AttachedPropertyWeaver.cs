@@ -76,7 +76,7 @@ namespace Bindables.Fody
 					return false;
 				}
 
-				if (property.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(ExcludeAttachedPropertyAttribute).FullName))
+				if (property.CustomAttributes.Any(attribute => attribute.AttributeType.Name == Consts.ExcludeAttachedPropertyAttribute))
 				{
 					return false;
 				}
@@ -187,7 +187,7 @@ namespace Bindables.Fody
 				TypeReference exceptionType = exceptionConstructor?.DeclaringType;
 
 				bool firstInstructionIsNewobj = bodyInstructions[0].OpCode == OpCodes.Newobj;
-				bool firstInstructionOperandIsWillBeImplementedByBindablesException = exceptionType?.Name == nameof(WillBeImplementedByBindablesException);
+				bool firstInstructionOperandIsWillBeImplementedByBindablesException = exceptionType?.Name == Consts.WillBeImplementedByBindablesException;
 				bool secondInstructionIsThrow = bodyInstructions[1].OpCode == OpCodes.Throw;
 
 				if (!firstInstructionIsNewobj || !firstInstructionOperandIsWillBeImplementedByBindablesException || !secondInstructionIsThrow)

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Windows;
 using Mono.Cecil;
 
@@ -6,14 +6,15 @@ namespace Bindables.Fody
 {
 	public static class AttributeUtilities
 	{
+
 		public static CustomAttribute GetDependencyPropertyAttribute(this IMemberDefinition member)
 		{
-			return member.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == nameof(DependencyPropertyAttribute));
+			return member.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == Consts.DependencyPropertyAttribute);
 		}
 
 		public static CustomAttribute GetAttachedPropertyAttribute(this IMemberDefinition member)
 		{
-			return member.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == nameof(AttachedPropertyAttribute));
+			return member.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == Consts.AttachedPropertyAttribute);
 		}
 
 		public static void RemoveBindableAttributes(this IMemberDefinition member)
@@ -80,7 +81,7 @@ namespace Bindables.Fody
 		public static bool IsMarkedAsReadOnly(this PropertyDefinition property)
 		{
 			CustomAttribute attribute = property.GetDependencyPropertyAttribute();
-			bool? isReadonly = attribute?.Properties.FirstOrDefault(p => p.Name == nameof(DependencyPropertyAttribute.IsReadOnly)).Argument.Value as bool?;
+			bool? isReadonly = attribute?.Properties.FirstOrDefault(p => p.Name == Consts.IsReadOnly).Argument.Value as bool?;
 
 			return isReadonly == true;
 		}
