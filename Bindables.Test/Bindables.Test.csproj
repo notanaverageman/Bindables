@@ -10,7 +10,7 @@
     <Reference Include="WindowsBase" />
     <PackageReference Include="FluentAssertions" Version="5.6.0" />
     <PackageReference Include="FodyHelpers" Version="4.0.2" />
-    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="1.0.5">
+    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="2.0.1">
 	    <PrivateAssets>contentfiles;analyzers</PrivateAssets>
     </PackageReference>
     <PackageReference Include="NUnit" Version="3.11.0" />
