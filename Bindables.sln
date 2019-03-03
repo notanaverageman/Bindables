@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables", "Bindables\Bindables.csproj", "{DE9E483A-ED6F-4EC1-A218-A1E104CC305B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FB2D2DF2-8542-4D1E-ABE2-DA7F1505C4E1} = {FB2D2DF2-8542-4D1E-ABE2-DA7F1505C4E1}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables.Fody", "Bindables.Fody\Bindables.Fody.csproj", "{FB2D2DF2-8542-4D1E-ABE2-DA7F1505C4E1}"
 EndProject
