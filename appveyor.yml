@@ -9,7 +9,7 @@ build:
 
 test:
   assemblies:
-    - '**\*Tests.dll'
+    - '**\*Test.dll'
 
 artifacts:
 - path: nugets\*.nupkg
