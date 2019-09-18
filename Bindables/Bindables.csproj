@@ -1,18 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="FodyPackaging.props" />
   <Import Project="FodyPackaging.targets" />
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net45;netcoreapp3.0</TargetFrameworks>
+    <UseWPF>True</UseWPF>
+    <Product>Bindables</Product>
     <Authors>Yusuf Tarık Günaydın</Authors>
     <Description>Fody add-in for creating dependency or attached properties from auto properties.</Description>
     <PackageOutputPath>$(SolutionDir)nugets</PackageOutputPath>
     <PackageIconUrl>https://github.com/yusuf-gunaydin/Bindables/raw/master/Icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/yusuf-gunaydin/Bindables</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright $([System.DateTime]::UtcNow.ToString(yyyy)).</Copyright>
+    <PackageTags>Fody, ILWeaving, Cecil, AOP, XAML, WPF, DependencyProperty, AttachedProperty, DataBinding</PackageTags>
+    <DisableFody>true</DisableFody>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationFramework" />
+    <PackageReference Include="Fody" Version="6.0.0" />
   </ItemGroup>
 </Project>
