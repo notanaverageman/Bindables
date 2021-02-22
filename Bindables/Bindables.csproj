@@ -4,7 +4,7 @@
   <Import Project="FodyPackaging.targets" />
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net45;netcoreapp3.1</TargetFrameworks>
     <UseWPF>True</UseWPF>
     <Product>Bindables</Product>
     <Authors>Yusuf Tarık Günaydın</Authors>
@@ -18,6 +18,6 @@
     <DisableFody>true</DisableFody>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Fody" Version="6.0.0" />
+    <PackageReference Include="Fody" Version="6.3.0" />
   </ItemGroup>
 </Project>
