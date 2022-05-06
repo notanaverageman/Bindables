@@ -231,14 +231,13 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 	protected CheckResult CheckThatClassHasBaseType(
 		SourceProductionContext context,
 		INamedTypeSymbol classSymbol,
-		string expectedBaseType)
+		string expectedBaseType,
+		DiagnosticDescriptor diagnosticDescriptor)
 	{
-		string? baseType = classSymbol.BaseType?.ToDisplayString();
-
-		if (baseType != expectedBaseType)
+		if (!InheritsFrom(classSymbol, expectedBaseType))
 		{
 			Diagnostic diagnostic = Diagnostic.Create(
-				Diagnostics.ClassDoesNotInheritFromDependencyObject,
+				diagnosticDescriptor,
 				classSymbol.Locations.FirstOrDefault() ?? Location.None,
 				classSymbol.Name);
 
@@ -247,6 +246,21 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		}
 
 		return CheckResult.Valid;
+
+		bool InheritsFrom(INamedTypeSymbol? symbol, string baseTypeName)
+		{
+			while (symbol != null)
+			{
+				if (symbol.ToDisplayString() == baseTypeName)
+				{
+					return true;
+				}
+
+				symbol = symbol.BaseType;
+			}
+
+			return false;
+		}
 	}
 
 	protected CheckResult CheckThatStaticConstructorDoesNotExist(

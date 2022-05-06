@@ -32,7 +32,7 @@ public class BindablePropertyGenerator : XamarinPropertyGenerator
 
 		CheckResult result = CheckResult.Valid;
 
-		result = result.Combine(CheckThatClassHasBaseType(context, classSymbol, "Xamarin.Forms.BindableObject"));
+		result = result.Combine(CheckThatClassHasBaseType(context, classSymbol, "Xamarin.Forms.BindableObject", Diagnostics.ClassDoesNotInheritFromBindableObject));
 		result = result.Combine(CheckThatStaticConstructorDoesNotExist(context, classSymbol));
 		result = result.Combine(CheckThatClassIsPartial(context, classSymbol));
 		result = result.Combine(CheckFieldTypeAndName(context, fieldSymbol, fieldTypeAndNameConditions));

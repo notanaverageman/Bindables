@@ -30,7 +30,7 @@ public class DependencyPropertyGenerator : WindowsPropertyGenerator
 
 		CheckResult result = CheckResult.Valid;
 
-		result = result.Combine(CheckThatClassHasBaseType(context, classSymbol, "System.Windows.DependencyObject"));
+		result = result.Combine(CheckThatClassHasBaseType(context, classSymbol, "System.Windows.DependencyObject", Diagnostics.ClassDoesNotInheritFromDependencyObject));
 		result = result.Combine(CheckThatStaticConstructorDoesNotExist(context, classSymbol));
 		result = result.Combine(CheckThatClassIsPartial(context, classSymbol));
 		result = result.Combine(CheckFieldTypeAndName(context, fieldSymbol, fieldTypeAndNameConditions));

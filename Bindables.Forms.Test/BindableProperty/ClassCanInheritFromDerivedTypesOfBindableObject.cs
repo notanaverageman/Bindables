@@ -6,13 +6,13 @@ using NUnit.Framework;
 namespace Bindables.Forms.Test.BindableProperty;
 
 [TestFixture]
-public class ClassHasToInheritFromBindableObject : FormsTestBase
+public class ClassCanInheritFromDerivedTypesOfBindableObject : FormsTestBase
 {
 	private const string SourceCode = @"
 using Bindables.Forms;
 using Xamarin.Forms;
 
-public partial class InvalidClass
+public partial class ExampleClass : View
 {
 	[BindableProperty(typeof(int))]
 	public static readonly BindableProperty ExampleProperty;
@@ -23,8 +23,8 @@ public partial class InvalidClass
 	{
 		TestResult result = Generate<BindablePropertyGenerator>(SourceCode);
 		Diagnostic? error = result.Diagnostics.SingleOrDefault(x => x.Descriptor.Equals(Diagnostics.ClassDoesNotInheritFromBindableObject));
-		
-		Assert.That(result.Diagnostics.Count, Is.EqualTo(1));
-		Assert.That(error, Is.Not.Null);
+
+		Assert.That(result.Diagnostics, Is.Empty);
+		Assert.That(error, Is.Null);
 	}
 }
