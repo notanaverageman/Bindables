@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>39c3e39c-c46d-41e0-a9d4-533d418cb244</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Bindables.Test</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Common\ClassShouldBePartialExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\ClassShouldNotHaveStaticConstructorExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectDefaultValueExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectFieldNameExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectFieldTypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectPropertyChangedMethodSignatureExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\MissingDefaultValueFieldExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\MissingPropertyChangedMethodExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\SourceCodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestResult.cs" />
+  </ItemGroup>
+</Project>

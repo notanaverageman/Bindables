@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>c3bc15dc-43f5-4d61-8bb6-e7fdde46c9af</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Bindables</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AttributeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CheckResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Diagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyGeneratorBase.cs" />
+  </ItemGroup>
+</Project>

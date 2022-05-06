@@ -7,3 +7,7 @@ trim_trailing_whitespace = true
 insert_final_newline = false
 indent_style = tab
 indent_size = 4
+
+[*.csproj]
+indent_style = spaces
+indent_size = 2
