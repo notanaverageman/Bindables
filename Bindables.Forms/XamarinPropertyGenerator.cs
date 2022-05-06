@@ -13,6 +13,8 @@ public abstract class XamarinPropertyGenerator : PropertyGeneratorBase
 using System;
 using Xamarin.Forms;
 
+#nullable enable
+
 namespace Bindables.Forms
 {{
     [AttributeUsage(AttributeTargets.Field)]

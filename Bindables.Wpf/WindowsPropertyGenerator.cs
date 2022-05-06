@@ -12,6 +12,8 @@ public abstract class WindowsPropertyGenerator : PropertyGeneratorBase
 using System;
 using System.Windows;
 
+#nullable enable
+
 namespace Bindables.Wpf
 {{
     [AttributeUsage(AttributeTargets.Field)]
