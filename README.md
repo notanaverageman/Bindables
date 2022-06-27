@@ -1,3 +1,6 @@
+> # No longer maintained https://github.com/notanaverageman/Bindables/issues/21
+
+
 
 ## An add-in for [Fody](https://github.com/Fody/Fody/) to convert regular properties into Dependency or Attached properties. 
 
