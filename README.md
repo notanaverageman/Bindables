@@ -1,107 +1,125 @@
 
-## An add-in for [Fody](https://github.com/Fody/Fody/) to convert regular properties into Dependency or Attached properties. 
+# Roslyn source generator to create dependency and attached properties for WPF and Xamarin.Forms
 
-![Bindables Icon](https://raw.github.com/yusuf-gunaydin/Bindables/master/Icon.png)
+[![NuGet Bindables.Wpf](https://img.shields.io/nuget/v/Bindables.Wpf.svg?label=Bindables.Wpf)](https://www.nuget.org/packages/Bindables.Wpf/)
+[![NuGet Bindables.Forms](https://img.shields.io/nuget/v/Bindables.Forms.svg?label=Bindables.Forms)](https://www.nuget.org/packages/Bindables.Forms/)
+[![AppVeyor](https://img.shields.io/appveyor/ci/notanaverageman/bindables.svg)](https://ci.appveyor.com/project/notanaverageman/bindables)
 
-_Bindables_ converts your auto properties into Wpf dependency or attached properties.  
-Additionally it allows you to set following options:
+## Usage
 
-  - Specify a default value.
-  - Specify `FrameworkPropertyMetadataOptions`.
-  - Specify a `PropertyChangedCallback` method.
-  - Register the property as readonly.
+Define a field with type __Dependency Property Type__ below and give it a name that ends with __Property Suffix__. Then, add __Attribute Type__ attribute to the field and pass the type of the property you want to create. Possible values are:
 
-[![AppVeyor](https://img.shields.io/appveyor/ci/yusuf-gunaydin/bindables.svg)](https://ci.appveyor.com/project/yusuf-gunaydin/bindables)
-[![NuGet](https://img.shields.io/nuget/v/Bindables.Fody.svg)](https://www.nuget.org/packages/Bindables.Fody/)
+|Project Type |Dependency Property Type|Access Type|Property Suffix|Field Type             |Attribute Type                             |
+|-------------|------------------------|-----------|---------------|-----------------------|-------------------------------------------|
+|WPF          |Dependency Property     |Read/Write |`Property`     |`DependencyProperty`   |`Bindables.Wpf.DependencyPropertyAttribute`|
+|WPF          |Dependency Property     |Read Only  |`PropertyKey`  |`DependencyPropertyKey`|`Bindables.Wpf.DependencyPropertyAttribute`|
+|WPF          |Attached Property       |Read/Write |`Property`     |`DependencyProperty`   |`Bindables.Wpf.AttachedPropertyAttribute`  |
+|WPF          |Attached Property       |Read Only  |`PropertyKey`  |`DependencyPropertyKey`|`Bindables.Wpf.AttachedPropertyAttribute`  |
+|Xamarin.Forms|Bindable Property       |Read/Write |`Property`     |`BindableProperty`     |`Bindables.Forms.BindablePropertyAttribute`|
+|Xamarin.Forms|Bindable Property       |Read Only  |`PropertyKey`  |`BindablePropertyKey`  |`Bindables.Forms.BindablePropertyAttribute`|
+|Xamarin.Forms|Attached Property       |Read/Write |`Property`     |`BindableProperty`     |`Bindables.Forms.AttachedPropertyAttribute`|
+|Xamarin.Forms|Attached Property       |Read Only  |`PropertyKey`  |`BindablePropertyKey`  |`Bindables.Forms.AttachedPropertyAttribute`|
 
-## How To Use
+## Options
 
-### Dependency Property
+You can pass following options via the attributes:
 
-You can convert regular properties to dependency properties by applying `DependencyPropertyAttribute` to individual properties or a whole class.
+|Option                           | Description                                                                       |
+|---------------------------------|-----------------------------------------------------------------------------------|
+`OnPropertyChanged`               | Name of the method that will be called when the property is changed.              |
+`DefaultValueField`               | Name of the static field that will provide the default value for the property.    |
+`Options` (WPF only)              | Pass `System.Windows.FrameworkPropertyMetadataOptions` to the dependency property.|
+`BindingMode` (Xamarin.Forms only)| Pass `Xamarin.Forms.BindingMode` to the dependency property.                      |
 
-When you apply the attribute on a class, all the available properties will be converted to dependency properties. The properties that will __not__ be converted are:
+Signature of `OnPropertyChanged` method should be:
+|Project Type |Signature                                                                              |
+|-------------|---------------------------------------------------------------------------------------|
+|WPF          |`static void MethodName(DependencyObject obj, DependencyPropertyChangedEventArgs args)`|
+|Xamarin.Forms|`static void MethodName(BindableObject obj, object oldValue, object newValue)`         |
 
-  - Non-auto properties. _(Properties with custom getters and setters.)_
-  - Readonly properties. _(Properties with no setter.)_
-  - Explicitly excluded properties. _(Properties with `[ExcludeDependencyProperty]` attribute.)_
+## Requirements
 
-When you apply the attribute on a class, you can further apply it to a property to specify options for that property.
+- Your class should be `partial`.
+- If you create a WPF dependency property or Xamarin.Forms bindable property, your class should inherit from `System.Windows.DependencyObject` or `Xamarin.Forms.BindableObject`. Attached properties don't have this requirement.
+- Bindables creates the static constructor for the class to initialize the dependency properties. If you have custom static constructor for a type, you can't use Bindables on it.
 
-Examples:
-```c#
-[DependencyProperty]
-public class YourClass : DependencyObject
-{
-    public int RegularDependencyProperty { get; set; }
+## Example
 
-    // Dependency property with FrameworkPropertyMetadataOptions.
-    [DependencyProperty(Options = FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)]
-    public int WithOptions { get; set; }
-
-    // Dependency property with a default value.
-    public string Name { get; set; } = "Default";
-    
-    // Dependency property with PropertyChangedCallback.
-    // This setting expects that a method with signature like below exists in the class.
-    // static void NameOfTheMethod(DependencyObject, DependencyPropertyChangedEventArgs)
-    [DependencyProperty(OnPropertyChanged = nameof(OnPropertyChanged))]
-    public int WithPropertyChangedCallback { get; set; }
-    
-    private static void OnPropertyChanged(
-        DependencyObject dependencyObject,
-        DependencyPropertyChangedEventArgs eventArgs)
-    {
-    }
-    
-    // Dependency property with CoerceValueCallback.
-    // This setting expects that a method with signature like below exists in the class.
-    // static object NameOfTheMethod(DependencyObject, object)
-    // You have to provide OnPropertyChanged along with OnCoerceValue. Otherwise a compiler error will be generated.
-    [DependencyProperty(OnPropertyChanged = nameof(OnPropertyChanged), OnCoerceValue = nameof(OnCoerceValue))]
-    public int WithCoerceValueCallback { get; set; }
-    
-    private static void OnCoerceValue(
-        DependencyObject dependencyObject,
-        object value)
-    {
-        return value;
-    }
-    
-    // Readonly dependency property. The visibility modifier of the setter can be anything.
-    [DependencyProperty(IsReadOnly = true)]
-    public string ReadOnly { get; private set; }
-}
-```
-
-### Attached Property
-
-The same principles with the dependency properties also apply to the attached property conversions. However, there are a few differences:
-
-  - Use `[AttachedProperty]` instead of `[DependencyProperty]` and `[ExcludeAttachedProperty]` instead of `[ExcludeDependencyProperty]`
-  - Properties must be static in order to be converted to attached properties.
-  - The class containing the attached properties does not have to inherit from DependencyObject.
-  - There should be a getter or setter method stub to make the xaml compiler happy. These methods can also be used explicitly when the attached value for an object has to be gotten or set in the code.
+### Your Code
 
 ```c#
-public class YourClass
+using System.Windows;
+using Bindables.Wpf;
+
+public partial class YourClass : DependencyObject
 {
-    [AttachedProperty]
-    public static string Name { get; set; }
+    private static readonly string DefaultValue = "Test";
 
-    public static string GetName(DependencyObject obj)
-    {
-        // This method has to have the only line below.
-        throw new WillBeImplementedByBindablesException();
-    }
+    [DependencyProperty(typeof(string))]
+    public static readonly DependencyProperty RegularProperty;
 
-    public static void SetName(DependencyObject obj, string value)
+    // You can use any visibility modifier.
+    [DependencyProperty(typeof(string))]
+    private static readonly DependencyPropertyKey ReadOnlyPropertyKey;
+
+    [DependencyProperty(typeof(string), OnPropertyChanged = nameof(PropertyChangedCallback), DefaultValueField = nameof(DefaultValue), Options = FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)]
+    public static readonly DependencyProperty CustomizedProperty;
+
+    private static void PropertyChangedCallback(DependencyObject obj, DependencyPropertyChangedEventArgs args)
     {
-        // This method has to be empty.
     }
 }
 ```
 
-## Icon
+### Generated Code
 
-[Link](https://thenounproject.com/term/link/9266/) designed by [Dmitry Mirolyubov](https://thenounproject.com/dmitriy.mir/) from The Noun Project.
+```c#
+// Generated by Bindables
+using System.Windows;
+
+public partial class YourClass
+{
+    public string Regular
+    {
+        get => (string)GetValue(RegularProperty);
+        set => SetValue(RegularProperty, value);
+    }
+
+    public static readonly DependencyProperty ReadOnlyProperty;
+
+    public string ReadOnly
+    {
+        get => (string)GetValue(ReadOnlyProperty);
+        private set => SetValue(ReadOnlyPropertyKey, value);
+    }
+
+    public string Customized
+    {
+        get => (string)GetValue(CustomizedProperty);
+        set => SetValue(CustomizedProperty, value);
+    }
+
+    static YourClass()
+    {
+        RegularProperty = DependencyProperty.Register(
+            nameof(Regular),
+            typeof(string),
+            typeof(YourClass),
+            new PropertyMetadata());
+
+        ReadOnlyPropertyKey = DependencyProperty.RegisterReadOnly(
+            nameof(ReadOnly),
+            typeof(string),
+            typeof(YourClass),
+            new PropertyMetadata());
+
+        ReadOnlyProperty = ReadOnlyPropertyKey.DependencyProperty;
+
+        CustomizedProperty = DependencyProperty.Register(
+            nameof(Customized),
+            typeof(string),
+            typeof(YourClass),
+            new FrameworkPropertyMetadata(DefaultValue, (FrameworkPropertyMetadataOptions)256, PropertyChangedCallback));
+    }
+}
+```
