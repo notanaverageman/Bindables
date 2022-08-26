@@ -394,7 +394,70 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 			Diagnostic diagnostic = Diagnostic.Create(
 				diagnosticDescriptor,
 				fieldSymbol.Locations.FirstOrDefault() ?? Location.None,
-				classSymbol.Name);
+				classSymbol.Name,
+				propertyChangedMethod);
+
+			context.ReportDiagnostic(diagnostic);
+		}
+	}
+
+	protected CheckResult CheckCoerceValueMethodSignature(
+		SourceProductionContext context,
+		INamedTypeSymbol classSymbol,
+		IFieldSymbol fieldSymbol,
+		INamedTypeSymbol attributeSymbol,
+		string[] parameterTypes)
+	{
+		AttributeData attributeData = fieldSymbol.GetAttributeData(attributeSymbol);
+		string? coerceValueMethodName = attributeData.GetOnCoerceValueMethod();
+
+		if (coerceValueMethodName == null)
+		{
+			return CheckResult.Valid;
+		}
+
+		IMethodSymbol? coerceValueMethod = classSymbol
+			.GetMembers()
+			.OfType<IMethodSymbol>()
+			.FirstOrDefault(x => x.Name == coerceValueMethodName);
+
+		if (coerceValueMethod == null)
+		{
+			AddDiagnostic(Diagnostics.MissingCoerceValueMethod);
+			return CheckResult.Invalid;
+		}
+
+		if (!coerceValueMethod.IsStatic)
+		{
+			AddDiagnostic();
+			return CheckResult.Invalid;
+		}
+
+		if (coerceValueMethod.ReturnType.SpecialType != SpecialType.System_Object)
+		{
+			AddDiagnostic();
+			return CheckResult.Invalid;
+		}
+
+		ImmutableArray<IParameterSymbol> parameters = coerceValueMethod.Parameters;
+
+		if (!parameters.Select(x => x.Type.ToDisplayString()).SequenceEqual(parameterTypes))
+		{
+			AddDiagnostic();
+			return CheckResult.Invalid;
+		}
+
+		return CheckResult.Valid;
+
+		void AddDiagnostic(DiagnosticDescriptor? diagnosticDescriptor = null)
+		{
+			diagnosticDescriptor ??= Diagnostics.IncorrectCoerceValueMethodSignature;
+
+			Diagnostic diagnostic = Diagnostic.Create(
+				diagnosticDescriptor,
+				fieldSymbol.Locations.FirstOrDefault() ?? Location.None,
+				classSymbol.Name,
+				coerceValueMethodName);
 
 			context.ReportDiagnostic(diagnostic);
 		}

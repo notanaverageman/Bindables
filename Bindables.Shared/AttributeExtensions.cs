@@ -17,6 +17,12 @@ public static class AttributeExtensions
 		TypedConstant typedConstant = attributeData.NamedArguments.SingleOrDefault(x => x.Key == "OnPropertyChanged").Value;
 		return typedConstant.Value?.ToString();
 	}
+	
+	public static string? GetOnCoerceValueMethod(this AttributeData attributeData)
+	{
+		TypedConstant typedConstant = attributeData.NamedArguments.SingleOrDefault(x => x.Key == "OnCoerceValue").Value;
+		return typedConstant.Value?.ToString();
+	}
 
 	public static string? GetDefaultValueField(this AttributeData attributeData)
 	{

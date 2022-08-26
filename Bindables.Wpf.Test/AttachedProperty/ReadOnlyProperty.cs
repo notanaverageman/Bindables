@@ -46,7 +46,7 @@ namespace Test
                 ""Example"",
                 typeof(int),
                 typeof(WpfClass),
-                new PropertyMetadata());
+                new FrameworkPropertyMetadata());
             
             ExampleProperty = ExamplePropertyKey.DependencyProperty;
             
