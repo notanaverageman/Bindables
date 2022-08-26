@@ -21,7 +21,7 @@ namespace Bindables.Wpf
     {{
         public Type PropertyType {{ get; }}
         public string? OnPropertyChanged {{ get; set; }}
-		public string? OnCoerceValue {{ get; set; }}
+        public string? OnCoerceValue {{ get; set; }}
         public string? DefaultValueField {{ get; set; }}
         public FrameworkPropertyMetadataOptions Options {{ get; set; }}
 
