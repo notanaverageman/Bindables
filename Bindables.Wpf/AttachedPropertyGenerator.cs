@@ -55,20 +55,21 @@ public class AttachedPropertyGenerator : WindowsPropertyGenerator
 		List<string> initializationLines)
 	{
 		AttributeData attributeData = field.GetAttributeData(attributeSymbol);
-		TypedConstant propertyType = attributeData.ConstructorArguments.SingleOrDefault();
+		INamedTypeSymbol? propertyType = attributeData.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
 
-		string fieldName = field.Name;
-		string fieldVisibility = SyntaxFacts.GetText(field.DeclaredAccessibility);
-		string propertyName = fieldName.Substring(0, fieldName.Length - "Property".Length);
-		string? propertyTypeName = propertyType.Value?.ToString();
-
-		if (propertyTypeName == null)
+		if (propertyType == null)
 		{
 			// TODO: Internal error.
 			return;
 		}
 
-		AddGetterSetterMethods(builder, propertyTypeName, propertyName, fieldVisibility);
+		string fieldName = field.Name;
+		string fieldVisibility = SyntaxFacts.GetText(field.DeclaredAccessibility);
+		string propertyName = fieldName.Substring(0, fieldName.Length - "Property".Length);
+		string maybeNullPropertyTypeName = propertyType.ToDisplayString(NullableFlowState.MaybeNull);
+		string propertyTypeName = propertyType.ToDisplayString();
+
+		AddGetterSetterMethods(builder, maybeNullPropertyTypeName, propertyName, fieldVisibility);
 
 		string metadataDefinition = GetMetadataDefinition(attributeData);
 
@@ -91,23 +92,24 @@ public class AttachedPropertyGenerator : WindowsPropertyGenerator
 			.GetAttributes()
 			.Single(x => x.AttributeClass?.Equals(attributeSymbol, SymbolEqualityComparer.Default) == true);
 
-		TypedConstant propertyType = attributeData.ConstructorArguments.SingleOrDefault();
+		INamedTypeSymbol? propertyType = attributeData.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
 
-		string fieldName = field.Name;
-		string fieldVisibility = SyntaxFacts.GetText(field.DeclaredAccessibility);
-		string propertyName = fieldName.Substring(0, fieldName.Length - "PropertyKey".Length);
-		string? propertyTypeName = propertyType.Value?.ToString();
-
-		if (propertyTypeName == null)
+		if (propertyType == null)
 		{
 			// TODO: Internal error.
 			return;
 		}
 
+		string fieldName = field.Name;
+		string fieldVisibility = SyntaxFacts.GetText(field.DeclaredAccessibility);
+		string propertyName = fieldName.Substring(0, fieldName.Length - "PropertyKey".Length);
+		string maybeNullPropertyTypeName = propertyType.ToDisplayString(NullableFlowState.MaybeNull);
+		string propertyTypeName = propertyType.ToDisplayString();
+
 		builder.AppendLine($"public static readonly DependencyProperty {propertyName}Property;");
 		builder.AppendLine();
 
-		AddGetterSetterMethods(builder, propertyTypeName, propertyName, fieldVisibility);
+		AddGetterSetterMethods(builder, maybeNullPropertyTypeName, propertyName, fieldVisibility);
 
 		string metadataDefinition = GetMetadataDefinition(attributeData);
 
