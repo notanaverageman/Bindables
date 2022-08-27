@@ -19,8 +19,3 @@ test:
 
 artifacts:
 - path: artifacts\*.nupkg
-
-deploy:
-  provider: NuGet
-  api_key:
-    secure: 77wpGvu/VlncfwO5hMozDOVshlpOQp9dzBbxI+ZfZuEawfDNQ98rM8R0YTL2BXq6
