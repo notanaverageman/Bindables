@@ -21,6 +21,7 @@ namespace Bindables.Wpf
     {{
         public Type PropertyType {{ get; }}
         public string? OnPropertyChanged {{ get; set; }}
+        public string? OnCoerceValue {{ get; set; }}
         public string? DefaultValueField {{ get; set; }}
         public FrameworkPropertyMetadataOptions Options {{ get; set; }}
 
@@ -35,47 +36,33 @@ namespace Bindables.Wpf
 	protected string GetMetadataDefinition(AttributeData attributeData)
 	{
 		string? propertyChangedMethod = attributeData.GetOnPropertyChangedMethod();
+		string? coerceValueMethod = attributeData.GetOnCoerceValueMethod();
 		string? defaultValueField = attributeData.GetDefaultValueField();
 		string? options = attributeData.GetFrameworkPropertyMetadataOptions();
 
-		if (propertyChangedMethod == null && defaultValueField == null && options == null)
-		{
-			return "new PropertyMetadata()";
-		}
+		string[] args = new string[4];
+		int count = 0;
 
-		string definition = options == null
-			? "new PropertyMetadata("
-			: "new FrameworkPropertyMetadata(";
-
-		if (defaultValueField != null)
+		if (defaultValueField != null || options != null)
 		{
-			definition += defaultValueField;
+			args[count++] = defaultValueField ?? "default";
 		}
 
 		if (options != null)
 		{
-			if (defaultValueField == null)
-			{
-				definition += "default";
-			}
-
-			definition += ", ";
-			definition += $"(FrameworkPropertyMetadataOptions){options}";
+			args[count++] = $"(FrameworkPropertyMetadataOptions){options}";
 		}
 
-		if (propertyChangedMethod != null)
+		if (propertyChangedMethod != null || coerceValueMethod != null)
 		{
-			if (defaultValueField != null || options != null)
-			{
-				definition += ", ";
-			}
-
-			definition += propertyChangedMethod;
+			args[count++] = propertyChangedMethod ?? "default";
 		}
 
-		definition += ")";
+		if (coerceValueMethod != null)
+		{
+			args[count++] = coerceValueMethod;
+		}
 
-
-		return definition;
+		return $"new FrameworkPropertyMetadata({string.Join(", ", args, 0, count)})";
 	}
 }

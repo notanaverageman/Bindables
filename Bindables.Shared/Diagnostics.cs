@@ -71,7 +71,23 @@ public class Diagnostics
 	public static readonly DiagnosticDescriptor IncorrectPropertyChangedMethodSignature = new(
 		"BN009",
 		"Incorrect PropertyChanged method signature",
-		"The signature of method '{0}' has to be 'static void {0}(DependencyObject, DependencyPropertyChangedEventArgs)'",
+		"The signature of method '{0}.{1}' has to be 'static void {1}(DependencyObject, DependencyPropertyChangedEventArgs)'",
+		"Code Generation",
+		DiagnosticSeverity.Error,
+		true);
+
+	public static readonly DiagnosticDescriptor MissingCoerceValueMethod = new(
+		"BN008",
+		"Missing CoerceValue method",
+		"The coerce value callback method 'static void {0}(DependencyObject, object)' is not found",
+		"Code Generation",
+		DiagnosticSeverity.Error,
+		true);
+
+	public static readonly DiagnosticDescriptor IncorrectCoerceValueMethodSignature = new(
+		"BN009",
+		"Incorrect CoerceValue method signature",
+		"The signature of method '{0}.{1}' has to be 'static object {1}(DependencyObject, object)'",
 		"Code Generation",
 		DiagnosticSeverity.Error,
 		true);

@@ -29,12 +29,19 @@ public class AttachedPropertyGenerator : WindowsPropertyGenerator
 			"System.Windows.DependencyPropertyChangedEventArgs"
 		};
 
+		string[] coerceValueMethodParameterTypes =
+		{
+			"System.Windows.DependencyObject",
+			"object",
+		};
+
 		CheckResult result = CheckResult.Valid;
 
 		result = result.Combine(CheckThatStaticConstructorDoesNotExist(context, classSymbol));
 		result = result.Combine(CheckThatClassIsPartial(context, classSymbol));
 		result = result.Combine(CheckFieldTypeAndName(context, fieldSymbol, fieldTypeAndNameConditions));
 		result = result.Combine(CheckPropertyChangedMethodSignature(context, classSymbol, fieldSymbol, attributeSymbol, propertyChangedMethodParameterTypes));
+		result = result.Combine(CheckCoerceValueMethodSignature(context, classSymbol, fieldSymbol, attributeSymbol, coerceValueMethodParameterTypes));
 		result = result.Combine(CheckDefaultValueField(context, classSymbol, fieldSymbol, attributeSymbol));
 
 		return result;

@@ -13,7 +13,7 @@ using Bindables.Wpf;
 
 public partial class WpfClass : DependencyObject
 {
-    private static readonly string DefaultValue = ""Test"";
+	private static readonly string DefaultValue = ""Test"";
 
 	[DependencyProperty(typeof(int))]
 	public static readonly DependencyProperty Example1Property;
@@ -33,9 +33,32 @@ public partial class WpfClass : DependencyObject
 	[DependencyProperty(typeof(string), OnPropertyChanged = nameof(PropertyChangedCallback), DefaultValueField = nameof(DefaultValue), Options = FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)]
 	public static readonly DependencyProperty Example6Property;
 
+	[DependencyProperty(typeof(int), OnCoerceValue = nameof(CoerceValueCallback))]
+	public static readonly DependencyProperty Example7Property;
+
+	[DependencyProperty(typeof(int), OnPropertyChanged = nameof(PropertyChangedCallback), OnCoerceValue = nameof(CoerceValueCallback))]
+	public static readonly DependencyProperty Example8Property;
+
+	[DependencyProperty(typeof(string), OnCoerceValue = nameof(CoerceValueCallback), DefaultValueField = nameof(DefaultValue))]
+	public static readonly DependencyProperty Example9Property;
+
+	[DependencyProperty(typeof(string), OnPropertyChanged = nameof(PropertyChangedCallback), OnCoerceValue = nameof(CoerceValueCallback), DefaultValueField = nameof(DefaultValue))]
+	public static readonly DependencyProperty Example10Property;
+
+	[DependencyProperty(typeof(string), OnCoerceValue = nameof(CoerceValueCallback), DefaultValueField = nameof(DefaultValue), Options = FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)]
+	public static readonly DependencyProperty Example11Property;
+
+	[DependencyProperty(typeof(string), OnPropertyChanged = nameof(PropertyChangedCallback), OnCoerceValue = nameof(CoerceValueCallback), DefaultValueField = nameof(DefaultValue), Options = FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)]
+	public static readonly DependencyProperty Example12Property;
+
     private static void PropertyChangedCallback(DependencyObject obj, DependencyPropertyChangedEventArgs args)
     {
     }
+
+	private static object CoerceValueCallback(DependencyObject obj, object value)
+	{
+		return """";
+	}
 }";
 
 	private const string ExpectedSourceCode = @"
@@ -80,25 +103,61 @@ public partial class WpfClass
         set => SetValue(Example6Property, value);
     }
 
+    public int Example7
+    {
+        get => (int)GetValue(Example7Property);
+        set => SetValue(Example7Property, value);
+    }
+
+    public int Example8
+    {
+        get => (int)GetValue(Example8Property);
+        set => SetValue(Example8Property, value);
+    }
+
+    public string Example9
+    {
+        get => (string)GetValue(Example9Property);
+        set => SetValue(Example9Property, value);
+    }
+
+    public string Example10
+    {
+        get => (string)GetValue(Example10Property);
+        set => SetValue(Example10Property, value);
+    }
+
+    public string Example11
+    {
+        get => (string)GetValue(Example11Property);
+        set => SetValue(Example11Property, value);
+    }
+
+    public string Example12
+    {
+        get => (string)GetValue(Example12Property);
+        set => SetValue(Example12Property, value);
+    }
+
     static WpfClass()
     {
         Example1Property = DependencyProperty.Register(
             nameof(Example1),
             typeof(int),
             typeof(WpfClass),
-            new PropertyMetadata());
+            new FrameworkPropertyMetadata());
         
         Example2Property = DependencyProperty.Register(
             nameof(Example2),
             typeof(int),
             typeof(WpfClass),
-            new PropertyMetadata(PropertyChangedCallback));
+            new FrameworkPropertyMetadata(PropertyChangedCallback));
         
         Example3Property = DependencyProperty.Register(
             nameof(Example3),
             typeof(string),
             typeof(WpfClass),
-            new PropertyMetadata(DefaultValue));
+            new FrameworkPropertyMetadata(DefaultValue));
         
         Example4Property = DependencyProperty.Register(
             nameof(Example4),
@@ -110,13 +169,49 @@ public partial class WpfClass
             nameof(Example5),
             typeof(string),
             typeof(WpfClass),
-            new PropertyMetadata(DefaultValue, PropertyChangedCallback));
+            new FrameworkPropertyMetadata(DefaultValue, PropertyChangedCallback));
         
         Example6Property = DependencyProperty.Register(
             nameof(Example6),
             typeof(string),
             typeof(WpfClass),
             new FrameworkPropertyMetadata(DefaultValue, (FrameworkPropertyMetadataOptions)256, PropertyChangedCallback));
+        
+        Example7Property = DependencyProperty.Register(
+            nameof(Example7),
+            typeof(int),
+            typeof(WpfClass),
+            new FrameworkPropertyMetadata(default, CoerceValueCallback));
+        
+        Example8Property = DependencyProperty.Register(
+            nameof(Example8),
+            typeof(int),
+            typeof(WpfClass),
+            new FrameworkPropertyMetadata(PropertyChangedCallback, CoerceValueCallback));
+        
+        Example9Property = DependencyProperty.Register(
+            nameof(Example9),
+            typeof(string),
+            typeof(WpfClass),
+            new FrameworkPropertyMetadata(DefaultValue, default, CoerceValueCallback));
+        
+        Example10Property = DependencyProperty.Register(
+            nameof(Example10),
+            typeof(string),
+            typeof(WpfClass),
+            new FrameworkPropertyMetadata(DefaultValue, PropertyChangedCallback, CoerceValueCallback));
+        
+        Example11Property = DependencyProperty.Register(
+            nameof(Example11),
+            typeof(string),
+            typeof(WpfClass),
+            new FrameworkPropertyMetadata(DefaultValue, (FrameworkPropertyMetadataOptions)256, default, CoerceValueCallback));
+        
+        Example12Property = DependencyProperty.Register(
+            nameof(Example12),
+            typeof(string),
+            typeof(WpfClass),
+            new FrameworkPropertyMetadata(DefaultValue, (FrameworkPropertyMetadataOptions)256, PropertyChangedCallback, CoerceValueCallback));
         
     }
 }";
