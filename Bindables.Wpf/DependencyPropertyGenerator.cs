@@ -55,22 +55,23 @@ public class DependencyPropertyGenerator : WindowsPropertyGenerator
 		List<string> initializationLines)
 	{
 		AttributeData attributeData = field.GetAttributeData(attributeSymbol);
-		TypedConstant propertyType = attributeData.ConstructorArguments.SingleOrDefault();
+		INamedTypeSymbol? propertyType = attributeData.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
 
-		string fieldName = field.Name;
-		string propertyName = fieldName.Substring(0, fieldName.Length - "Property".Length);
-		string? propertyTypeName = propertyType.Value?.ToString();
-
-		if (propertyTypeName == null)
+		if (propertyType == null)
 		{
 			// TODO: Internal error.
 			return;
 		}
 
-		builder.AppendLine($"public {propertyTypeName} {propertyName}");
+		string fieldName = field.Name;
+		string propertyName = fieldName.Substring(0, fieldName.Length - "Property".Length);
+		string maybeNullPropertyTypeName = propertyType.ToDisplayString(NullableFlowState.MaybeNull);
+		string propertyTypeName = propertyType.ToDisplayString();
+
+		builder.AppendLine($"public {maybeNullPropertyTypeName} {propertyName}");
 		builder.OpenScope();
 
-		builder.AppendLine($"get => ({propertyTypeName})GetValue({propertyName}Property);");
+		builder.AppendLine($"get => ({maybeNullPropertyTypeName})GetValue({propertyName}Property);");
 		builder.AppendLine($"set => SetValue({propertyName}Property, value);");
 
 		builder.CloseScope();
@@ -97,25 +98,26 @@ public class DependencyPropertyGenerator : WindowsPropertyGenerator
 			.GetAttributes()
 			.Single(x => x.AttributeClass?.Equals(attributeSymbol, SymbolEqualityComparer.Default) == true);
 
-		TypedConstant propertyType = attributeData.ConstructorArguments.SingleOrDefault();
+		INamedTypeSymbol? propertyType = attributeData.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
 
-		string fieldName = field.Name;
-		string propertyName = fieldName.Substring(0, fieldName.Length - "PropertyKey".Length);
-		string? propertyTypeName = propertyType.Value?.ToString();
-
-		if (propertyTypeName == null)
+		if (propertyType == null)
 		{
 			// TODO: Internal error.
 			return;
 		}
 
+		string fieldName = field.Name;
+		string propertyName = fieldName.Substring(0, fieldName.Length - "PropertyKey".Length);
+		string maybeNullPropertyTypeName = propertyType.ToDisplayString(NullableFlowState.MaybeNull);
+		string propertyTypeName = propertyType.ToDisplayString();
+
 		builder.AppendLine($"public static readonly DependencyProperty {propertyName}Property;");
 		builder.AppendLine();
 
-		builder.AppendLine($"public {propertyTypeName} {propertyName}");
+		builder.AppendLine($"public {maybeNullPropertyTypeName} {propertyName}");
 		builder.OpenScope();
 
-		builder.AppendLine($"get => ({propertyTypeName})GetValue({propertyName}Property);");
+		builder.AppendLine($"get => ({maybeNullPropertyTypeName})GetValue({propertyName}Property);");
 		builder.AppendLine($"private set => SetValue({propertyName}PropertyKey, value);");
 
 		builder.CloseScope();
