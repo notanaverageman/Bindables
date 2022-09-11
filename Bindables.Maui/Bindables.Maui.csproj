@@ -20,6 +20,6 @@
   </ItemGroup>
   
   <Import Project="..\Bindables.Shared\Bindables.Shared.projitems" Label="Shared" />
-  
-  <Import Project="..\Bindables.Shared.Windows\Bindables.Shared.Windows.projitems" Label="Shared" />
+  <Import Project="..\Bindables.Shared.Xamarin\Bindables.Shared.Xamarin.projitems" Label="Shared" />
+
 </Project>

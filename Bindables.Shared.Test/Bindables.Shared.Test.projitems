@@ -9,15 +9,16 @@
     <Import_RootNamespace>Bindables.Test</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Common\ClassShouldBePartialExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\ClassShouldNotHaveStaticConstructorExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectDefaultValueExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectFieldNameExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectFieldTypeExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectPropertyChangedMethodSignatureExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\MissingDefaultValueFieldExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\MissingPropertyChangedMethodExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common\SourceCodeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\ClassShouldBePartial.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\ClassShouldNotHaveStaticConstructor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectPropertyChangedMethodSignature.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\MissingDefaultValueField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\MissingPropertyChangedMethod.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectDefaultValue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectFieldName.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Common\IncorrectFieldType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DependencyProperties\ClassCanInheritFromDerivedTypesOfBindableObject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DependencyProperties\ClassShouldInheritFromBindableObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestResult.cs" />
   </ItemGroup>

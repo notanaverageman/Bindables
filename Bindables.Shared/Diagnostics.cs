@@ -13,7 +13,7 @@ public class Diagnostics
 		true);
 
 	public static readonly DiagnosticDescriptor ClassDoesNotInheritFromBindableObject = new(
-		"BN001",
+		"BN002",
 		"Class does not inherit from BindableObject",
 		"Class '{0}' does not inherit from BindableObject",
 		"Code Generation",
@@ -63,7 +63,7 @@ public class Diagnostics
 	public static readonly DiagnosticDescriptor MissingPropertyChangedMethod = new(
 		"BN008",
 		"Missing PropertyChanged method",
-		"The property changed callback method 'static void {0}(DependencyObject, DependencyPropertyChangedEventArgs)' is not found",
+		"The property changed callback method 'static void {0}' is not found",
 		"Code Generation",
 		DiagnosticSeverity.Error,
 		true);
@@ -71,29 +71,29 @@ public class Diagnostics
 	public static readonly DiagnosticDescriptor IncorrectPropertyChangedMethodSignature = new(
 		"BN009",
 		"Incorrect PropertyChanged method signature",
-		"The signature of method '{0}.{1}' has to be 'static void {1}(DependencyObject, DependencyPropertyChangedEventArgs)'",
+		"The signature of method '{0}' has to be 'static void {1}'",
 		"Code Generation",
 		DiagnosticSeverity.Error,
 		true);
 
 	public static readonly DiagnosticDescriptor MissingCoerceValueMethod = new(
-		"BN008",
+		"BN010",
 		"Missing CoerceValue method",
-		"The coerce value callback method 'static void {0}(DependencyObject, object)' is not found",
+		"The coerce value callback method 'static object {0}' is not found",
 		"Code Generation",
 		DiagnosticSeverity.Error,
 		true);
 
 	public static readonly DiagnosticDescriptor IncorrectCoerceValueMethodSignature = new(
-		"BN009",
+		"BN011",
 		"Incorrect CoerceValue method signature",
-		"The signature of method '{0}.{1}' has to be 'static object {1}(DependencyObject, object)'",
+		"The signature of method '{0}' has to be 'static object {1}'",
 		"Code Generation",
 		DiagnosticSeverity.Error,
 		true);
 
 	public static readonly DiagnosticDescriptor MissingDefaultValueField = new(
-		"BN010",
+		"BN012",
 		"Missing default value field",
 		"The default value field 'static {1} {0}' is not found",
 		"Code Generation",
@@ -101,7 +101,7 @@ public class Diagnostics
 		true);
 
 	public static readonly DiagnosticDescriptor IncorrectDefaultValueFieldDefinition = new(
-		"BN011",
+		"BN013",
 		"Incorrect default value field definition",
 		"Default value field '{0}' should be static and of type '{1}'",
 		"Code Generation",

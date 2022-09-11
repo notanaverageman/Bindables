@@ -1,24 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
+    <TargetFramework>net6.0</TargetFramework>
+	<Nullable>enable</Nullable>
+    <UseMaui>true</UseMaui>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bindables.Forms\Bindables.Forms.csproj" />
+    <ProjectReference Include="..\Bindables.Maui\Bindables.Maui.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Combinatorics" Version="2.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.1" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.0" />
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2401" />
   </ItemGroup>
 
   <Import Project="..\Bindables.Shared.Test\Bindables.Shared.Test.projitems" Label="Shared" />
+
   <Import Project="..\Bindables.Shared.Test.Xamarin\Bindables.Shared.Test.Xamarin.projitems" Label="Shared" />
 
 </Project>

@@ -20,9 +20,21 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Bindables.Shared", "Bindabl
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Bindables.Shared.Test", "Bindables.Shared.Test\Bindables.Shared.Test.shproj", "{39C3E39C-C46D-41E0-A9D4-533D418CB244}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables.Forms", "Bindables.Forms\Bindables.Forms.csproj", "{1D1DE6C1-5C42-452B-8F95-D1DFC247B71B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bindables.Forms", "Bindables.Forms\Bindables.Forms.csproj", "{1D1DE6C1-5C42-452B-8F95-D1DFC247B71B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables.Forms.Test", "Bindables.Forms.Test\Bindables.Forms.Test.csproj", "{B2F88A8B-EAC1-4272-A058-A77EDB7ADA3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bindables.Forms.Test", "Bindables.Forms.Test\Bindables.Forms.Test.csproj", "{B2F88A8B-EAC1-4272-A058-A77EDB7ADA3C}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Bindables.Shared.Xamarin", "Bindables.Shared.Xamarin\Bindables.Shared.Xamarin.shproj", "{6B04B044-DC79-44A0-AE9D-B03BD897C015}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables.Maui", "Bindables.Maui\Bindables.Maui.csproj", "{00F21535-2280-403B-8FC6-5562FE355B28}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bindables.Maui.Test", "Bindables.Maui.Test\Bindables.Maui.Test.csproj", "{809EB4A2-5880-4773-9EAD-CD39C41AA6DE}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Bindables.Shared.Test.Xamarin", "Bindables.Shared.Test.Xamarin\Bindables.Shared.Test.Xamarin.shproj", "{9C529B49-575C-4E93-947B-1078F367D13F}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Bindables.Shared.Windows", "Bindables.Shared.Windows\Bindables.Shared.Windows.shproj", "{D67BD273-9700-47C1-9350-C565146E9FFE}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Bindables.Shared.Test.Windows", "Bindables.Shared.Test.Windows\Bindables.Shared.Test.Windows.shproj", "{C3D08220-1D33-47CF-BD2C-4CF62BBC5893}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +58,14 @@ Global
 		{B2F88A8B-EAC1-4272-A058-A77EDB7ADA3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2F88A8B-EAC1-4272-A058-A77EDB7ADA3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2F88A8B-EAC1-4272-A058-A77EDB7ADA3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00F21535-2280-403B-8FC6-5562FE355B28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00F21535-2280-403B-8FC6-5562FE355B28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00F21535-2280-403B-8FC6-5562FE355B28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00F21535-2280-403B-8FC6-5562FE355B28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{809EB4A2-5880-4773-9EAD-CD39C41AA6DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{809EB4A2-5880-4773-9EAD-CD39C41AA6DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{809EB4A2-5880-4773-9EAD-CD39C41AA6DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{809EB4A2-5880-4773-9EAD-CD39C41AA6DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,11 +74,22 @@ Global
 		SolutionGuid = {29380B5B-7A89-42DC-8A3F-6575A13D7084}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Bindables.Shared.Xamarin\Bindables.Shared.Xamarin.projitems*{00f21535-2280-403b-8fc6-5562fe355b28}*SharedItemsImports = 5
+		Bindables.Shared\Bindables.Shared.projitems*{00f21535-2280-403b-8fc6-5562fe355b28}*SharedItemsImports = 5
+		Bindables.Shared.Xamarin\Bindables.Shared.Xamarin.projitems*{1d1de6c1-5c42-452b-8f95-d1dfc247b71b}*SharedItemsImports = 5
 		Bindables.Shared\Bindables.Shared.projitems*{1d1de6c1-5c42-452b-8f95-d1dfc247b71b}*SharedItemsImports = 5
-		Bindables.Shared.Test\Bindables.Shared.Test.projitems*{39c3e39c-c46d-41e0-a9d4-533d418cb244}*SharedItemsImports = 13
+		Bindables.Shared.Test.Windows\Bindables.Shared.Test.Windows.projitems*{52bd4ea5-c19a-47ab-9ae9-89b0613e4b82}*SharedItemsImports = 5
 		Bindables.Shared.Test\Bindables.Shared.Test.projitems*{52bd4ea5-c19a-47ab-9ae9-89b0613e4b82}*SharedItemsImports = 5
+		Bindables.Shared.Windows\Bindables.Shared.Windows.projitems*{56f62adb-2bb6-4a44-b43c-5f581d4d16b1}*SharedItemsImports = 5
 		Bindables.Shared\Bindables.Shared.projitems*{56f62adb-2bb6-4a44-b43c-5f581d4d16b1}*SharedItemsImports = 5
+		Bindables.Shared.Xamarin\Bindables.Shared.Xamarin.projitems*{6b04b044-dc79-44a0-ae9d-b03bd897c015}*SharedItemsImports = 13
+		Bindables.Shared.Test.Xamarin\Bindables.Shared.Test.Xamarin.projitems*{809eb4a2-5880-4773-9ead-cd39c41aa6de}*SharedItemsImports = 5
+		Bindables.Shared.Test\Bindables.Shared.Test.projitems*{809eb4a2-5880-4773-9ead-cd39c41aa6de}*SharedItemsImports = 5
+		Bindables.Shared.Test.Xamarin\Bindables.Shared.Test.Xamarin.projitems*{9c529b49-575c-4e93-947b-1078f367d13f}*SharedItemsImports = 13
+		Bindables.Shared.Test.Xamarin\Bindables.Shared.Test.Xamarin.projitems*{b2f88a8b-eac1-4272-a058-a77edb7ada3c}*SharedItemsImports = 5
 		Bindables.Shared.Test\Bindables.Shared.Test.projitems*{b2f88a8b-eac1-4272-a058-a77edb7ada3c}*SharedItemsImports = 5
 		Bindables.Shared\Bindables.Shared.projitems*{c3bc15dc-43f5-4d61-8bb6-e7fdde46c9af}*SharedItemsImports = 13
+		Bindables.Shared.Test.Windows\Bindables.Shared.Test.Windows.projitems*{c3d08220-1d33-47cf-bd2c-4cf62bbc5893}*SharedItemsImports = 13
+		Bindables.Shared.Windows\Bindables.Shared.Windows.projitems*{d67bd273-9700-47c1-9350-c565146e9ffe}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

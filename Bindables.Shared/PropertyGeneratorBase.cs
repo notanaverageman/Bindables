@@ -9,13 +9,40 @@ namespace Bindables;
 
 public abstract class PropertyGeneratorBase : IIncrementalGenerator
 {
-	protected abstract string AttributeName { get; }
-	protected abstract string PlatformNamespace { get; }
-	protected abstract string AttributeTypeName { get; }
-	protected abstract string AttributeSourceText { get; }
+	public abstract bool IsAttachedPropertyGenerator { get; }
 
-	protected abstract string DependencyPropertyName { get; }
-	protected abstract string DependencyPropertyKeyName { get; }
+	public abstract string AttributeName { get; }
+	public abstract string AttributeNamespace { get; }
+	public abstract string PlatformNamespace { get; }
+	public abstract string AttributeSourceText { get; }
+	public abstract string BaseClassName { get; }
+	public abstract string DerivedFromBaseClassName { get; }
+	public abstract string RegisterMethod { get; }
+	public abstract string RegisterReadOnlyMethod { get; }
+	public abstract string RegisterAttachedMethod { get; }
+	public abstract string RegisterAttachedReadOnlyMethod { get; }
+
+	public abstract IReadOnlyList<string> PropertyChangedMethodParameterTypes { get; }
+	public abstract IReadOnlyList<string> CoerceValueMethodParameterTypes { get; }
+
+	public IReadOnlyList<(string, string, DiagnosticDescriptor)> FieldTypeAndNameConditions { get; }
+
+	public abstract string DependencyPropertyName { get; }
+	public abstract string DependencyPropertyKeyName { get; }
+
+	public abstract DiagnosticDescriptor DoesNotInheritFromBaseClassDiagnosticDescriptor { get; }
+
+	public string AttributeTypeName => $"{AttributeNamespace}.{AttributeName}";
+
+	public PropertyGeneratorBase()
+	{
+		// TODO: Use static interface
+		FieldTypeAndNameConditions = new[]
+		{
+			($"{PlatformNamespace}.{DependencyPropertyName}", "Property", Diagnostics.IncorrectFieldName),
+			($"{PlatformNamespace}.{DependencyPropertyKeyName}", "PropertyKey", Diagnostics.IncorrectReadOnlyFieldName),
+		};
+	}
 
 	public void Initialize(IncrementalGeneratorInitializationContext context)
 	{
@@ -109,7 +136,11 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 					continue;
 				}
 
-				if (Check(context, classSymbol, fieldSymbol, attributeSymbol) == CheckResult.Valid)
+				CheckResult checkResult = IsAttachedPropertyGenerator
+					? CheckAttachedProperty(context, classSymbol, fieldSymbol, attributeSymbol)
+					: CheckDependencyProperty(context, classSymbol, fieldSymbol, attributeSymbol);
+
+				if (checkResult == CheckResult.Valid)
 				{
 					fields.Add(fieldSymbol);
 				}
@@ -198,37 +229,307 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 
 		if (isDependencyProperty)
 		{
-			ProcessDependencyProperty(builder, classSymbol, field, attributeSymbol, initializationLines);
+			if (IsAttachedPropertyGenerator)
+			{
+				ProcessAttachedProperty(builder, classSymbol, field, attributeSymbol, initializationLines);
+			}
+			else
+			{
+				ProcessDependencyProperty(builder, classSymbol, field, attributeSymbol, initializationLines);
+			}
 		}
 		else if (isDependencyPropertyKey)
 		{
-			ProcessDependencyPropertyKey(builder, classSymbol, field, attributeSymbol, initializationLines);
+			if (IsAttachedPropertyGenerator)
+			{
+				ProcessAttachedPropertyKey(builder, classSymbol, field, attributeSymbol, initializationLines);
+			}
+			else
+			{
+				ProcessDependencyPropertyKey(builder, classSymbol, field, attributeSymbol, initializationLines);
+			}
 		}
 		else
 		{
 			// TODO: Internal error.
 		}
 	}
+	
+	protected void ProcessDependencyProperty(
+		CodeBuilder builder,
+		INamedTypeSymbol classSymbol,
+		IFieldSymbol field,
+		ISymbol attributeSymbol,
+		List<string> initializationLines)
+	{
+		AttributeData attributeData = field.GetAttributeData(attributeSymbol);
+		INamedTypeSymbol? propertyType = attributeData.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
 
-	protected abstract CheckResult Check(
+		if (propertyType == null)
+		{
+			// TODO: Internal error.
+			return;
+		}
+
+		string fieldName = field.Name;
+		string fieldVisibility = SyntaxFacts.GetText(field.DeclaredAccessibility);
+		string propertyName = fieldName.Substring(0, fieldName.Length - "Property".Length);
+		string maybeNullPropertyTypeName = propertyType.ToDisplayString(NullableFlowState.MaybeNull);
+		string propertyTypeName = propertyType.ToDisplayString();
+
+		AppendPropertyWithGetterSetter(
+			builder,
+			maybeNullPropertyTypeName,
+			propertyName,
+			fieldVisibility,
+			isReadOnly: false);
+
+		AppendCreatePropertyExpression(
+			RegisterMethod,
+			initializationLines,
+			attributeData,
+			classSymbol,
+			propertyTypeName,
+			propertyName,
+			fieldName);
+	}
+
+	protected void ProcessDependencyPropertyKey(
+		CodeBuilder builder,
+		INamedTypeSymbol classSymbol,
+		IFieldSymbol field,
+		ISymbol attributeSymbol,
+		List<string> initializationLines)
+	{
+		AttributeData attributeData = field
+			.GetAttributes()
+			.Single(x => x.AttributeClass?.Equals(attributeSymbol, SymbolEqualityComparer.Default) == true);
+
+		INamedTypeSymbol? propertyType = attributeData.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
+
+		if (propertyType == null)
+		{
+			// TODO: Internal error.
+			return;
+		}
+
+		string fieldName = field.Name;
+		string fieldVisibility = SyntaxFacts.GetText(field.DeclaredAccessibility);
+		string propertyName = fieldName.Substring(0, fieldName.Length - "PropertyKey".Length);
+		string maybeNullPropertyTypeName = propertyType.ToDisplayString(NullableFlowState.MaybeNull);
+		string propertyTypeName = propertyType.ToDisplayString();
+
+		builder.AppendLine($"public static readonly {DependencyPropertyName} {propertyName}Property;");
+		builder.AppendLine();
+
+		AppendPropertyWithGetterSetter(
+			builder,
+			maybeNullPropertyTypeName,
+			propertyName,
+			fieldVisibility,
+			isReadOnly: true);
+
+		AppendCreatePropertyExpression(
+			RegisterReadOnlyMethod,
+			initializationLines,
+			attributeData,
+			classSymbol,
+			propertyTypeName,
+			propertyName,
+			fieldName);
+
+		initializationLines.Add($"{propertyName}Property = {fieldName}.{DependencyPropertyName};");
+		initializationLines.Add("");
+	}
+
+	protected void ProcessAttachedProperty(
+		CodeBuilder builder,
+		INamedTypeSymbol classSymbol,
+		IFieldSymbol field,
+		ISymbol attributeSymbol,
+		List<string> initializationLines)
+	{
+		AttributeData attributeData = field.GetAttributeData(attributeSymbol);
+		INamedTypeSymbol? propertyType = attributeData.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
+
+		if (propertyType == null)
+		{
+			// TODO: Internal error.
+			return;
+		}
+
+		string fieldName = field.Name;
+		string fieldVisibility = SyntaxFacts.GetText(field.DeclaredAccessibility);
+		string propertyName = fieldName.Substring(0, fieldName.Length - "Property".Length);
+		string maybeNullPropertyTypeName = propertyType.ToDisplayString(NullableFlowState.MaybeNull);
+		string propertyTypeName = propertyType.ToDisplayString();
+
+		AddGetterSetterMethods(builder, maybeNullPropertyTypeName, propertyName, fieldVisibility);
+
+		AppendCreatePropertyExpression(
+			RegisterAttachedMethod,
+			initializationLines,
+			attributeData,
+			classSymbol,
+			propertyTypeName,
+			propertyName,
+			fieldName);
+	}
+
+	protected void ProcessAttachedPropertyKey(
+		CodeBuilder builder,
+		INamedTypeSymbol classSymbol,
+		IFieldSymbol field,
+		ISymbol attributeSymbol,
+		List<string> initializationLines)
+	{
+		AttributeData attributeData = field
+			.GetAttributes()
+			.Single(x => x.AttributeClass?.Equals(attributeSymbol, SymbolEqualityComparer.Default) == true);
+
+		INamedTypeSymbol? propertyType = attributeData.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
+
+		if (propertyType == null)
+		{
+			// TODO: Internal error.
+			return;
+		}
+
+		string fieldName = field.Name;
+		string fieldVisibility = SyntaxFacts.GetText(field.DeclaredAccessibility);
+		string propertyName = fieldName.Substring(0, fieldName.Length - "PropertyKey".Length);
+		string maybeNullPropertyTypeName = propertyType.ToDisplayString(NullableFlowState.MaybeNull);
+		string propertyTypeName = propertyType.ToDisplayString();
+
+		builder.AppendLine($"public static readonly {DependencyPropertyName} {propertyName}Property;");
+		builder.AppendLine();
+
+		AddGetterSetterMethods(builder, maybeNullPropertyTypeName, propertyName, fieldVisibility);
+
+		AppendCreatePropertyExpression(
+			RegisterAttachedReadOnlyMethod,
+			initializationLines,
+			attributeData,
+			classSymbol,
+			propertyTypeName,
+			propertyName,
+			fieldName);
+
+		initializationLines.Add($"{propertyName}Property = {fieldName}.{DependencyPropertyName};");
+		initializationLines.Add("");
+	}
+
+	protected abstract IReadOnlyList<string> GetAdditionalParameters(AttributeData attributeData);
+
+	protected void AppendPropertyWithGetterSetter(
+		CodeBuilder builder,
+		string propertyTypeName,
+		string propertyName,
+		string fieldVisibility,
+		bool isReadOnly)
+	{
+		string propertySuffix = isReadOnly ? "Key" : "";
+
+		// Do not append visibility if it is public.
+		fieldVisibility = fieldVisibility.Replace("public", "");
+
+		builder.AppendLine($"public {propertyTypeName} {propertyName}");
+		builder.OpenScope();
+
+		builder.AppendLine($"get => ({propertyTypeName})GetValue({propertyName}Property);");
+		builder.AppendLine($"{fieldVisibility} set => SetValue({propertyName}Property{propertySuffix}, value);".Trim());
+
+		builder.CloseScope();
+		builder.AppendLine();
+	}
+
+	protected void AppendCreatePropertyExpression(
+		string createMethod,
+		List<string> initializationLines,
+		AttributeData attributeData,
+		INamedTypeSymbol classSymbol,
+		string propertyTypeName,
+		string propertyName,
+		string fieldName)
+	{
+		IReadOnlyList<string> additionalParameters = GetAdditionalParameters(attributeData);
+
+		initializationLines.Add($"{fieldName} = {DependencyPropertyName}.{createMethod}(");
+		initializationLines.Add($"    \"{propertyName}\",");
+		initializationLines.Add($"    typeof({propertyTypeName}),");
+		initializationLines.Add($"    typeof({classSymbol.Name}),");
+
+		for (int i = 0; i < additionalParameters.Count; i++)
+		{
+			string additionalParameter = i == additionalParameters.Count - 1
+				? $"    {additionalParameters[i]});"
+				: $"    {additionalParameters[i]},";
+
+			initializationLines.Add(additionalParameter);
+		}
+
+		initializationLines.Add("");
+	}
+
+	protected void AddGetterSetterMethods(
+		CodeBuilder builder,
+		string propertyTypeName,
+		string propertyName,
+		string fieldVisibility)
+	{
+		builder.AppendLine($"public static {propertyTypeName} Get{propertyName}({BaseClassName} target)");
+		builder.OpenScope();
+
+		builder.AppendLine($"return ({propertyTypeName})target.GetValue({propertyName}Property);");
+
+		builder.CloseScope();
+		builder.AppendLine();
+
+		builder.AppendLine($"{fieldVisibility} static void Set{propertyName}({BaseClassName} target, {propertyTypeName} value)");
+		builder.OpenScope();
+
+		builder.AppendLine($"target.SetValue({propertyName}Property, value);");
+
+		builder.CloseScope();
+		builder.AppendLine();
+	}
+
+	protected CheckResult CheckDependencyProperty(
 		SourceProductionContext context,
 		INamedTypeSymbol classSymbol,
 		IFieldSymbol fieldSymbol,
-		INamedTypeSymbol attributeSymbol);
+		INamedTypeSymbol attributeSymbol)
+	{
+		CheckResult result = CheckResult.Valid;
 
-	protected abstract void ProcessDependencyProperty(
-		CodeBuilder builder,
-		INamedTypeSymbol classSymbol,
-		IFieldSymbol field,
-		ISymbol attributeSymbol,
-		List<string> initializationLines);
+		result = result.Combine(CheckThatClassHasBaseType(context, classSymbol, $"{PlatformNamespace}.{BaseClassName}", DoesNotInheritFromBaseClassDiagnosticDescriptor));
+		result = result.Combine(CheckThatStaticConstructorDoesNotExist(context, classSymbol));
+		result = result.Combine(CheckThatClassIsPartial(context, classSymbol));
+		result = result.Combine(CheckFieldTypeAndName(context, fieldSymbol, FieldTypeAndNameConditions));
+		result = result.Combine(CheckPropertyChangedMethodSignature(context, classSymbol, fieldSymbol, attributeSymbol, PropertyChangedMethodParameterTypes));
+		result = result.Combine(CheckCoerceValueMethodSignature(context, classSymbol, fieldSymbol, attributeSymbol, CoerceValueMethodParameterTypes));
+		result = result.Combine(CheckDefaultValueField(context, classSymbol, fieldSymbol, attributeSymbol));
 
-	protected abstract void ProcessDependencyPropertyKey(
-		CodeBuilder builder,
+		return result;
+	}
+
+	protected CheckResult CheckAttachedProperty(
+		SourceProductionContext context,
 		INamedTypeSymbol classSymbol,
-		IFieldSymbol field,
-		ISymbol attributeSymbol,
-		List<string> initializationLines);
+		IFieldSymbol fieldSymbol,
+		INamedTypeSymbol attributeSymbol)
+	{
+		CheckResult result = CheckResult.Valid;
+
+		result = result.Combine(CheckThatStaticConstructorDoesNotExist(context, classSymbol));
+		result = result.Combine(CheckThatClassIsPartial(context, classSymbol));
+		result = result.Combine(CheckFieldTypeAndName(context, fieldSymbol, FieldTypeAndNameConditions));
+		result = result.Combine(CheckPropertyChangedMethodSignature(context, classSymbol, fieldSymbol, attributeSymbol, PropertyChangedMethodParameterTypes));
+		result = result.Combine(CheckCoerceValueMethodSignature(context, classSymbol, fieldSymbol, attributeSymbol, CoerceValueMethodParameterTypes));
+		result = result.Combine(CheckDefaultValueField(context, classSymbol, fieldSymbol, attributeSymbol));
+
+		return result;
+	}
 
 	protected CheckResult CheckThatClassHasBaseType(
 		SourceProductionContext context,
@@ -308,7 +609,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 	protected CheckResult CheckFieldTypeAndName(
 		SourceProductionContext context,
 		IFieldSymbol symbol,
-		params (string FieldType, string FieldNameSuffix, DiagnosticDescriptor SuffixDiagnostic)[] conditions)
+		IReadOnlyList<(string FieldType, string FieldNameSuffix, DiagnosticDescriptor SuffixDiagnostic)> conditions)
 	{
 		string typeFullName = symbol.Type.ToDisplayString();
 		string fieldName = symbol.Name;
@@ -321,7 +622,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 				Diagnostics.IncorrectFieldType,
 				symbol.Locations.FirstOrDefault() ?? Location.None,
 				symbol.Name,
-				matchedCondition.FieldType);
+				string.Join(" or ", conditions.Select(x => x.FieldType)));
 
 			context.ReportDiagnostic(diagnostic);
 			return CheckResult.Invalid;
@@ -346,7 +647,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		INamedTypeSymbol classSymbol,
 		IFieldSymbol fieldSymbol,
 		INamedTypeSymbol attributeSymbol,
-		string[] parameterTypes)
+		IReadOnlyList<string> parameterTypes)
 	{
 		AttributeData attributeData = fieldSymbol.GetAttributeData(attributeSymbol);
 		string? propertyChangedMethodName = attributeData.GetOnPropertyChangedMethod();
@@ -396,8 +697,8 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 			Diagnostic diagnostic = Diagnostic.Create(
 				diagnosticDescriptor,
 				fieldSymbol.Locations.FirstOrDefault() ?? Location.None,
-				classSymbol.Name,
-				propertyChangedMethod);
+				propertyChangedMethodName,
+				$"{propertyChangedMethodName}({string.Join(", ", PropertyChangedMethodParameterTypes)})");
 
 			context.ReportDiagnostic(diagnostic);
 		}
@@ -408,7 +709,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		INamedTypeSymbol classSymbol,
 		IFieldSymbol fieldSymbol,
 		INamedTypeSymbol attributeSymbol,
-		string[] parameterTypes)
+		IReadOnlyList<string> parameterTypes)
 	{
 		AttributeData attributeData = fieldSymbol.GetAttributeData(attributeSymbol);
 		string? coerceValueMethodName = attributeData.GetOnCoerceValueMethod();
@@ -458,8 +759,8 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 			Diagnostic diagnostic = Diagnostic.Create(
 				diagnosticDescriptor,
 				fieldSymbol.Locations.FirstOrDefault() ?? Location.None,
-				classSymbol.Name,
-				coerceValueMethodName);
+				coerceValueMethodName,
+				$"{coerceValueMethodName}({string.Join(", ", CoerceValueMethodParameterTypes)})");
 
 			context.ReportDiagnostic(diagnostic);
 		}

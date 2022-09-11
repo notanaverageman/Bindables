@@ -10,20 +10,24 @@ using NUnit.Framework;
 
 namespace Bindables.Test;
 
-public abstract class TestBase
+public abstract partial class TestBase<T> where T : PropertyGeneratorBase, new()
 {
-	public abstract string AttributeNamespace { get; }
-	public abstract string PlatformNamespace { get; }
-	public abstract string BaseClassName { get; }
-	public abstract string DependencyPropertyName { get; }
-	public abstract string DependencyPropertyKeyName { get; }
-	public abstract string[] PropertyChangedMethodParameterTypes { get; }
+	private static readonly T Generator = new();
 
-	public TestResult Generate<T>(
+	public string AttributeName => Generator.AttributeName;
+	public string AttributeNamespace => Generator.AttributeNamespace;
+	public string PlatformNamespace => Generator.PlatformNamespace;
+	public string BaseClassName => Generator.BaseClassName;
+	public string DerivedFromBaseClassName => Generator.DerivedFromBaseClassName;
+	public string DependencyPropertyName => Generator.DependencyPropertyName;
+	public string DependencyPropertyKeyName => Generator.DependencyPropertyKeyName;
+	public IReadOnlyList<string> PropertyChangedMethodParameterTypes => Generator.PropertyChangedMethodParameterTypes;
+	public DiagnosticDescriptor DoesNotInheritFromBaseClassDiagnosticDescriptor => Generator.DoesNotInheritFromBaseClassDiagnosticDescriptor;
+
+	public TestResult Generate(
 		string? sourceCode = null,
 		IReadOnlyList<AdditionalText>? additionalTexts = null,
 		IReadOnlyList<SyntaxTree>? additionalSyntaxTrees = null)
-		where T : IIncrementalGenerator, new()
 	{
 		List<MetadataReference> references = new();
 		Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -85,6 +89,63 @@ public abstract class TestBase
 	protected virtual IEnumerable<MetadataReference> GetAdditionalReferences()
 	{
 		return Enumerable.Empty<MetadataReference>();
+	}
+
+	protected void TestSourceCodeTemplate(
+		string sourceCodeTemplate,
+		DiagnosticDescriptor? diagnosticDescriptor)
+	{
+		string sourceCode = ReplacePlaceholders(sourceCodeTemplate);
+
+		TestResult result = Generate(sourceCode);
+		Diagnostic? error = result.Diagnostics.SingleOrDefault(x => x.Descriptor.Equals(diagnosticDescriptor));
+
+		if (diagnosticDescriptor == null)
+		{
+			Assert.That(
+				result.Diagnostics,
+				Is.Empty,
+				() => string.Join("\n", result.Diagnostics.Select(x => x.ToString())));
+
+			Assert.That(error, Is.Null);
+		}
+		else
+		{
+			Assert.That(
+				result.Diagnostics.Count,
+				Is.EqualTo(1),
+				() => string.Join("\n", result.Diagnostics.Select(x => x.ToString())));
+
+			Assert.That(error, Is.Not.Null);
+		}
+	}
+
+	protected void TestSourceCodeTemplate(
+		string sourceCodeTemplate,
+		string expectedSourceCodeTemplate)
+	{
+		string sourceCode = ReplacePlaceholders(sourceCodeTemplate);
+		string expectedSourceCode = ReplacePlaceholders(expectedSourceCodeTemplate);
+
+		TestResult result = Generate(sourceCode);
+		CheckResult(result);
+
+		
+		Assert.That(result.SyntaxTrees, Has.Count.EqualTo(1));
+		Assert.That(result.SyntaxTrees.Single().ToString().Trim(), Is.EqualTo(expectedSourceCode.Trim()));
+	}
+
+	public string ReplacePlaceholders(string sourceCode)
+	{
+		return sourceCode
+			.Replace("PlatformNamespace", PlatformNamespace)
+			.Replace("AttributeNamespace", AttributeNamespace)
+			.Replace("DerivedFromBaseClassName", DerivedFromBaseClassName)
+			.Replace("BaseClassName", BaseClassName)
+			.Replace("AttributeName", AttributeName)
+			.Replace("KeyPropertyType", DependencyPropertyKeyName)
+			.Replace("PropertyType", DependencyPropertyName);
+
 	}
 
 	public void CheckResult(TestResult result)

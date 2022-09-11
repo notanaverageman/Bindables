@@ -20,4 +20,6 @@
 
   <Import Project="..\Bindables.Shared.Test\Bindables.Shared.Test.projitems" Label="Shared" />
 
+  <Import Project="..\Bindables.Shared.Test.Windows\Bindables.Shared.Test.Windows.projitems" Label="Shared" />
+
 </Project>
