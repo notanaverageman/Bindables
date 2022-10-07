@@ -6,6 +6,9 @@
 	<Authors>Yusuf Tarık Günaydın</Authors>
 	<PackageDescription>Roslyn source generator to create dependency and attached properties</PackageDescription>
 	<PackageTags>DependencyProperty;AttachedProperty;SourceGenerator;Roslyn;WPF;MAUI;Xamarin.Forms</PackageTags>
+    <PackageProjectUrl>https://github.com/notanaverageman/Bindables</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/notanaverageman/Bindables.git</RepositoryUrl> 
+    <RepositoryType>git</RepositoryType>
     <LangVersion>latest</LangVersion>
 	<AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
   </PropertyGroup>
