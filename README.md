@@ -1,8 +1,9 @@
 
-# Roslyn source generator to create dependency and attached properties for WPF and Xamarin.Forms
+# Roslyn source generator to create dependency and attached properties for WPF, Xamarin.Forms, and .NET MAUI
 
 [![NuGet Bindables.Wpf](https://img.shields.io/nuget/v/Bindables.Wpf.svg?label=Bindables.Wpf)](https://www.nuget.org/packages/Bindables.Wpf/)
 [![NuGet Bindables.Forms](https://img.shields.io/nuget/v/Bindables.Forms.svg?label=Bindables.Forms)](https://www.nuget.org/packages/Bindables.Forms/)
+[![NuGet Bindables.Forms](https://img.shields.io/nuget/v/Bindables.Maui.svg?label=Bindables.Maui)](https://www.nuget.org/packages/Bindables.Maui/)
 [![AppVeyor](https://img.shields.io/appveyor/ci/notanaverageman/bindables.svg)](https://ci.appveyor.com/project/notanaverageman/bindables)
 
 ## Usage
@@ -19,35 +20,40 @@ Define a field with type __Dependency Property Type__ below and give it a name t
 |Xamarin.Forms|Bindable Property       |Read Only  |`PropertyKey`  |`BindablePropertyKey`  |`Bindables.Forms.BindablePropertyAttribute`|
 |Xamarin.Forms|Attached Property       |Read/Write |`Property`     |`BindableProperty`     |`Bindables.Forms.AttachedPropertyAttribute`|
 |Xamarin.Forms|Attached Property       |Read Only  |`PropertyKey`  |`BindablePropertyKey`  |`Bindables.Forms.AttachedPropertyAttribute`|
+|.NET MAUI    |Bindable Property       |Read/Write |`Property`     |`BindableProperty`     |`Bindables.Maui.BindablePropertyAttribute` |
+|.NET MAUI    |Bindable Property       |Read Only  |`PropertyKey`  |`BindablePropertyKey`  |`Bindables.Maui.BindablePropertyAttribute` |
+|.NET MAUI    |Attached Property       |Read/Write |`Property`     |`BindableProperty`     |`Bindables.Maui.AttachedPropertyAttribute` |
+|.NET MAUI    |Attached Property       |Read Only  |`PropertyKey`  |`BindablePropertyKey`  |`Bindables.Maui.AttachedPropertyAttribute` |
 
 ## Options
 
-You can pass following options via the attributes:
+You can pass following options:
 
-|Option                            | Description                                                                       |
-|----------------------------------|-----------------------------------------------------------------------------------|
-|`OnPropertyChanged`               | Name of the method that will be called when the property is changed.              |
-|`OnCoerceValue` (WPF only)        | Name of the method that will be called when the property is re-evaluated/coerced. |
-|`DefaultValueField`               | Name of the static field that will provide the default value for the property.    |
-|`Options` (WPF only)              | Pass `System.Windows.FrameworkPropertyMetadataOptions` to the dependency property.|
-|`BindingMode` (Xamarin.Forms only)| Pass `Xamarin.Forms.BindingMode` to the dependency property.                      |
+|Option                       | Description                                                                       |
+|-----------------------------|-----------------------------------------------------------------------------------|
+|`OnPropertyChanged`          | Name of the method that will be called when the property is changed.              |
+|`OnCoerceValue` (WPF)        | Name of the method that will be called when the property is re-evaluated/coerced. |
+|`DefaultValueField`          | Name of the static field that will provide the default value for the property.    |
+|`Options` (WPF)              | Pass `System.Windows.FrameworkPropertyMetadataOptions` to the dependency property.|
+|`BindingMode` (Xamarin.Forms)| Pass `Xamarin.Forms.BindingMode` to the dependency property.                      |
+|`BindingMode` (.NET MAUI)    | Pass `Microsoft.Maui.Controls.BindingMode` to the dependency property.            |
 
 Signature of `OnPropertyChanged` method should be:
-|Project Type |Signature                                                                              |
-|-------------|---------------------------------------------------------------------------------------|
-|WPF          |`static void MethodName(DependencyObject obj, DependencyPropertyChangedEventArgs args)`|
-|Xamarin.Forms|`static void MethodName(BindableObject obj, object oldValue, object newValue)`         |
+|Project Type             |Signature                                                                              |
+|-------------------------|---------------------------------------------------------------------------------------|
+|WPF                      |`static void MethodName(DependencyObject obj, DependencyPropertyChangedEventArgs args)`|
+|Xamarin.Forms & .NET MAUI|`static void MethodName(BindableObject obj, object oldValue, object newValue)`         |
 
 Signature of `OnCoerceValue` method should be:
-|Project Type |Signature                                                                              |
-|-------------|---------------------------------------------------------------------------------------|
-|WPF          |`static object MethodName(DependencyObject obj, object value)`                         |
-|Xamarin.Forms|*Currently not supported*                                                              |
+|Project Type             |Signature                                                     |
+|-------------------------|--------------------------------------------------------------|
+|WPF                      |`static object MethodName(DependencyObject obj, object value)`|
+|Xamarin.Forms & .NET MAUI|`static object MethodName(BindableObject obj, object value)`  |
 
 ## Requirements
 
 - Your class should be `partial`.
-- If you create a WPF dependency property or Xamarin.Forms bindable property, your class should inherit from `System.Windows.DependencyObject` or `Xamarin.Forms.BindableObject`. Attached properties don't have this requirement.
+- If you create a dependency property (WPF) or bindable property (Xamarin.Forms & .NET MAUI), your class should inherit from `System.Windows.DependencyObject` or `Xamarin.Forms.BindableObject` or `Microsoft.Maui.Controls.BindableObject` according to the project type. Attached properties don't have this requirement.
 - Bindables creates the static constructor for the class to initialize the dependency properties. If you have custom static constructor for a type, you can't use Bindables on it.
 
 ## Example (WPF)
