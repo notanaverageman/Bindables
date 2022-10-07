@@ -11,3 +11,7 @@ indent_size = 4
 [*.csproj]
 indent_style = spaces
 indent_size = 2
+
+[*.props]
+indent_style = spaces
+indent_size = 2
