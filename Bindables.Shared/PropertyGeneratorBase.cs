@@ -691,7 +691,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 
 		ImmutableArray<IParameterSymbol> parameters = propertyChangedMethod.Parameters;
 
-		if (!parameters.Select(x => x.Type.ToDisplayString()).SequenceEqual(parameterTypes))
+		if (!parameters.Select(x => x.Type.WithNullableAnnotation(NullableAnnotation.None).ToDisplayString()).SequenceEqual(parameterTypes))
 		{
 			AddDiagnostic();
 			return CheckResult.Invalid;
@@ -753,7 +753,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 
 		ImmutableArray<IParameterSymbol> parameters = coerceValueMethod.Parameters;
 
-		if (!parameters.Select(x => x.Type.ToDisplayString()).SequenceEqual(parameterTypes))
+		if (!parameters.Select(x => x.Type.WithNullableAnnotation(NullableAnnotation.None).ToDisplayString()).SequenceEqual(parameterTypes))
 		{
 			AddDiagnostic();
 			return CheckResult.Invalid;

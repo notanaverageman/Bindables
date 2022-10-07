@@ -55,7 +55,8 @@ public partial class ExampleClass : {BaseClassName}
     {{
     }}
 
-	private static object CoerceValueCallback({BaseClassName} obj, object value)
+    // Test with nullable parameters
+	private static object CoerceValueCallback({BaseClassName} obj, object? value)
 	{{
 		return """";
 	}}

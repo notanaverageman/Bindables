@@ -33,7 +33,8 @@ public partial class ExampleClass : {BaseClassName}
 	[{DependencyPropertyAttributeName}(typeof(string), OnPropertyChanged = nameof(PropertyChangedCallback), DefaultValueField = nameof(DefaultValue), BindingMode = BindingMode.OneTime)]
 	public static readonly {DependencyPropertyName} Example6Property;
 
-    private static void PropertyChangedCallback({BaseClassName} obj, object oldValue, object newValue)
+    // Test with nullable parameters
+    private static void PropertyChangedCallback({BaseClassName} obj, object? oldValue, object? newValue)
     {{
     }}
 
