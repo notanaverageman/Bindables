@@ -9,12 +9,7 @@
     <Import_RootNamespace>Bindables.Shared.Test.Xamarin</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)AttachedProperty\ReadOnlyProperty.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)AttachedProperty\RegularProperty.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DependencyProperty\ReadOnlyProperty.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DependencyProperty\RegularProperty.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)DependencyProperty\" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReadOnlyProperty.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RegularProperty.cs" />
   </ItemGroup>
 </Project>

@@ -13,10 +13,11 @@ namespace Bindables.Test;
 public abstract partial class TestBase<T> where T : PropertyGeneratorBase, new()
 {
 	private static readonly T Generator = new();
-
-	public string AttributeName => Generator.AttributeName;
+	
 	public string AttributeNamespace => Generator.AttributeNamespace;
 	public string PlatformNamespace => Generator.PlatformNamespace;
+	public string DependencyPropertyAttributeName => Generator.DependencyPropertyAttributeName;
+	public string AttachedPropertyAttributeName => Generator.AttachedPropertyAttributeName;
 	public string BaseClassName => Generator.BaseClassName;
 	public string DerivedFromBaseClassName => Generator.DerivedFromBaseClassName;
 	public string DependencyPropertyName => Generator.DependencyPropertyName;
@@ -92,11 +93,9 @@ public abstract partial class TestBase<T> where T : PropertyGeneratorBase, new()
 	}
 
 	protected void TestSourceCodeTemplate(
-		string sourceCodeTemplate,
+		string sourceCode,
 		DiagnosticDescriptor? diagnosticDescriptor)
 	{
-		string sourceCode = ReplacePlaceholders(sourceCodeTemplate);
-
 		TestResult result = Generate(sourceCode);
 		Diagnostic? error = result.Diagnostics.SingleOrDefault(x => x.Descriptor.Equals(diagnosticDescriptor));
 
@@ -121,31 +120,15 @@ public abstract partial class TestBase<T> where T : PropertyGeneratorBase, new()
 	}
 
 	protected void TestSourceCodeTemplate(
-		string sourceCodeTemplate,
-		string expectedSourceCodeTemplate)
+		string sourceCode,
+		string expectedSourceCode)
 	{
-		string sourceCode = ReplacePlaceholders(sourceCodeTemplate);
-		string expectedSourceCode = ReplacePlaceholders(expectedSourceCodeTemplate);
-
 		TestResult result = Generate(sourceCode);
 		CheckResult(result);
 
 		
 		Assert.That(result.SyntaxTrees, Has.Count.EqualTo(1));
 		Assert.That(result.SyntaxTrees.Single().ToString().Trim(), Is.EqualTo(expectedSourceCode.Trim()));
-	}
-
-	public string ReplacePlaceholders(string sourceCode)
-	{
-		return sourceCode
-			.Replace("PlatformNamespace", PlatformNamespace)
-			.Replace("AttributeNamespace", AttributeNamespace)
-			.Replace("DerivedFromBaseClassName", DerivedFromBaseClassName)
-			.Replace("BaseClassName", BaseClassName)
-			.Replace("AttributeName", AttributeName)
-			.Replace("KeyPropertyType", DependencyPropertyKeyName)
-			.Replace("PropertyType", DependencyPropertyName);
-
 	}
 
 	public void CheckResult(TestResult result)

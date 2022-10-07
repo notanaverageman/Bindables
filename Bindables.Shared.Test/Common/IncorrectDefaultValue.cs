@@ -7,36 +7,36 @@ public abstract partial class TestBase<T>
 	[Test]
 	public void IncorrectDefaultValueFieldType()
 	{
-		const string sourceCodeTemplate = @"
-using PlatformNamespace;
-using AttributeNamespace;
+		string sourceCode = $@"
+using {PlatformNamespace};
+using {AttributeNamespace};
 
-public partial class InvalidClass : BaseClassName
-{
+public partial class InvalidClass : {BaseClassName}
+{{
     private static string ExamplePropertyDefaultValue;
 
-	[AttributeName(typeof(int), DefaultValueField = nameof(ExamplePropertyDefaultValue))]
-	public static readonly PropertyType ExampleProperty;
-}";
+	[{DependencyPropertyAttributeName}(typeof(int), DefaultValueField = nameof(ExamplePropertyDefaultValue))]
+	public static readonly {DependencyPropertyName} ExampleProperty;
+}}";
 
-		TestSourceCodeTemplate(sourceCodeTemplate, Diagnostics.IncorrectDefaultValueFieldDefinition);
+		TestSourceCodeTemplate(sourceCode, Diagnostics.IncorrectDefaultValueFieldDefinition);
 	}
 
 	[Test]
 	public void NonStaticDefaultValueField()
 	{
-		const string sourceCodeTemplate = @"
-using PlatformNamespace;
-using AttributeNamespace;
+		string sourceCode = $@"
+using {PlatformNamespace};
+using {AttributeNamespace};
 
-public partial class InvalidClass : BaseClassName
-{
+public partial class InvalidClass : {BaseClassName}
+{{
     private int ExamplePropertyDefaultValue;
 
-	[AttributeName(typeof(int), DefaultValueField = nameof(ExamplePropertyDefaultValue))]
-	public static readonly PropertyType ExampleProperty;
-}";
+	[{DependencyPropertyAttributeName}(typeof(int), DefaultValueField = nameof(ExamplePropertyDefaultValue))]
+	public static readonly {DependencyPropertyName} ExampleProperty;
+}}";
 
-		TestSourceCodeTemplate(sourceCodeTemplate, Diagnostics.IncorrectDefaultValueFieldDefinition);
+		TestSourceCodeTemplate(sourceCode, Diagnostics.IncorrectDefaultValueFieldDefinition);
 	}
 }

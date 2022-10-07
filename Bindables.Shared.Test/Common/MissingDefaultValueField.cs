@@ -7,16 +7,16 @@ public abstract partial class TestBase<T>
 	[Test]
 	public void MissingDefaultValueField()
 	{
-		const string sourceCodeTemplate = @"
-using PlatformNamespace;
-using AttributeNamespace;
+		string sourceCode = $@"
+using {PlatformNamespace};
+using {AttributeNamespace};
 
-public partial class InvalidClass : BaseClassName
-{
-	[AttributeName(typeof(int), DefaultValueField = ""ExamplePropertyDefaultValue"")]
-	public static readonly PropertyType ExampleProperty;
-}";
+public partial class InvalidClass : {BaseClassName}
+{{
+	[{DependencyPropertyAttributeName}(typeof(int), DefaultValueField = ""ExamplePropertyDefaultValue"")]
+	public static readonly {DependencyPropertyName} ExampleProperty;
+}}";
 
-		TestSourceCodeTemplate(sourceCodeTemplate, Diagnostics.MissingDefaultValueField);
+		TestSourceCodeTemplate(sourceCode, Diagnostics.MissingDefaultValueField);
 	}
 }

@@ -8,6 +8,9 @@ public abstract class XamarinPropertyGenerator : PropertyGeneratorBase
 	public sealed override string DependencyPropertyName => "BindableProperty";
 	public sealed override string DependencyPropertyKeyName => "BindablePropertyKey";
 
+	public sealed override string DependencyPropertyAttributeName => "BindablePropertyAttribute";
+	public sealed override string AttachedPropertyAttributeName => "AttachedPropertyAttribute";
+
 	public override string BaseClassName => "BindableObject";
 	public override string DerivedFromBaseClassName => "Button";
 
@@ -21,29 +24,8 @@ public abstract class XamarinPropertyGenerator : PropertyGeneratorBase
 
 	public override DiagnosticDescriptor DoesNotInheritFromBaseClassDiagnosticDescriptor => Diagnostics.ClassDoesNotInheritFromBindableObject;
 
-	public sealed override string AttributeSourceText => $@"
-using System;
-using {PlatformNamespace};
-
-#nullable enable
-
-namespace {AttributeNamespace}
-{{
-    [AttributeUsage(AttributeTargets.Field)]
-    internal class {AttributeName} : Attribute
-    {{
-        public Type PropertyType {{ get; }}
-        public string? OnPropertyChanged {{ get; set; }}
-        public string? DefaultValueField {{ get; set; }}
-        public BindingMode BindingMode {{ get; set; }}
-
-        public {AttributeName}(Type propertyType)
-        {{
-            PropertyType = propertyType;
-        }}
-    }}
-}}
-";
+	public sealed override string DependencyPropertyAttributeSourceText => GetAttributeSourceText(DependencyPropertyAttributeName);
+	public sealed override string AttachedPropertyAttributeSourceText => GetAttributeSourceText(AttachedPropertyAttributeName);
 
 	public XamarinPropertyGenerator()
 	{
@@ -60,6 +42,33 @@ namespace {AttributeNamespace}
 			$"{PlatformNamespace}.{BaseClassName}",
 			"object"
 		};
+	}
+
+	private string GetAttributeSourceText(string attributeName)
+	{
+		return $@"
+using System;
+using {PlatformNamespace};
+
+#nullable enable
+
+namespace {AttributeNamespace}
+{{
+    [AttributeUsage(AttributeTargets.Field)]
+    internal class {attributeName} : Attribute
+    {{
+        public Type PropertyType {{ get; }}
+        public string? OnPropertyChanged {{ get; set; }}
+        public string? DefaultValueField {{ get; set; }}
+        public BindingMode BindingMode {{ get; set; }}
+
+        public {attributeName}(Type propertyType)
+        {{
+            PropertyType = propertyType;
+        }}
+    }}
+}}
+";
 	}
 	
 	protected override IReadOnlyList<string> GetAdditionalParameters(AttributeData attributeData)

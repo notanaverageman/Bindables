@@ -7,16 +7,16 @@ public abstract partial class TestBase<T>
 	[Test]
 	public void ClassShouldBePartial()
 	{
-		const string sourceCodeTemplate = @"
-using PlatformNamespace;
-using AttributeNamespace;
+		string sourceCode = $@"
+using {PlatformNamespace};
+using {AttributeNamespace};
 
-public class InvalidClass : BaseClassName
-{
-	[AttributeName(typeof(int))]
-	public static readonly PropertyType ExampleProperty;
-}";
+public class InvalidClass : {BaseClassName}
+{{
+	[{DependencyPropertyAttributeName}(typeof(int))]
+	public static readonly {DependencyPropertyName} ExampleProperty;
+}}";
 
-		TestSourceCodeTemplate(sourceCodeTemplate, Diagnostics.ClassShouldBePartial);
+		TestSourceCodeTemplate(sourceCode, Diagnostics.ClassShouldBePartial);
 	}
 }

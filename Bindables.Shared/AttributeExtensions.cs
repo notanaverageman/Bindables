@@ -5,11 +5,11 @@ namespace Bindables;
 
 public static class AttributeExtensions
 {
-	public static AttributeData GetAttributeData(this IFieldSymbol field, ISymbol attributeSymbol)
+	public static AttributeData? GetAttributeData(this IFieldSymbol field, ISymbol attributeSymbol)
 	{
 		return field
 			.GetAttributes()
-			.Single(x => x.AttributeClass?.Equals(attributeSymbol, SymbolEqualityComparer.Default) == true);
+			.SingleOrDefault(x => x.AttributeClass?.Equals(attributeSymbol, SymbolEqualityComparer.Default) == true);
 	}
 
 	public static string? GetOnPropertyChangedMethod(this AttributeData attributeData)

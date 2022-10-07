@@ -7,16 +7,16 @@ public abstract partial class TestBase<T>
 	[Test]
 	public void MissingPropertyChangedMethod()
 	{
-		const string sourceCodeTemplate = @"
-using PlatformNamespace;
-using AttributeNamespace;
+		string sourceCode = $@"
+using {PlatformNamespace};
+using {AttributeNamespace};
 
-public partial class InvalidClass : BaseClassName
-{
-	[AttributeName(typeof(int), OnPropertyChanged = ""PropertyChangedCallback"")]
-	public static readonly PropertyType ExampleProperty;
-}";
+public partial class InvalidClass : {BaseClassName}
+{{
+	[{DependencyPropertyAttributeName}(typeof(int), OnPropertyChanged = ""PropertyChangedCallback"")]
+	public static readonly {DependencyPropertyName} ExampleProperty;
+}}";
 
-		TestSourceCodeTemplate(sourceCodeTemplate, Diagnostics.MissingPropertyChangedMethod);
+		TestSourceCodeTemplate(sourceCode, Diagnostics.MissingPropertyChangedMethod);
 	}
 }

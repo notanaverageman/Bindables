@@ -9,12 +9,12 @@ namespace Bindables;
 
 public abstract class PropertyGeneratorBase : IIncrementalGenerator
 {
-	public abstract bool IsAttachedPropertyGenerator { get; }
-
-	public abstract string AttributeName { get; }
 	public abstract string AttributeNamespace { get; }
 	public abstract string PlatformNamespace { get; }
-	public abstract string AttributeSourceText { get; }
+	public abstract string DependencyPropertyAttributeName { get; }
+	public abstract string AttachedPropertyAttributeName { get; }
+	public abstract string DependencyPropertyAttributeSourceText { get; }
+	public abstract string AttachedPropertyAttributeSourceText { get; }
 	public abstract string BaseClassName { get; }
 	public abstract string DerivedFromBaseClassName { get; }
 	public abstract string RegisterMethod { get; }
@@ -32,7 +32,8 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 
 	public abstract DiagnosticDescriptor DoesNotInheritFromBaseClassDiagnosticDescriptor { get; }
 
-	public string AttributeTypeName => $"{AttributeNamespace}.{AttributeName}";
+	public string DependencyPropertyAttributeTypeName => $"{AttributeNamespace}.{DependencyPropertyAttributeName}";
+	public string AttachedPropertyAttributeTypeName => $"{AttributeNamespace}.{AttachedPropertyAttributeName}";
 
 	public PropertyGeneratorBase()
 	{
@@ -46,7 +47,16 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 
 	public void Initialize(IncrementalGeneratorInitializationContext context)
 	{
-		context.RegisterPostInitializationOutput(i => i.AddSource($"{AttributeName}.g.cs", AttributeSourceText.Trim()));
+		context.RegisterPostInitializationOutput(i =>
+		{
+			i.AddSource(
+				$"{DependencyPropertyAttributeTypeName}.g.cs",
+				DependencyPropertyAttributeSourceText.Trim());
+
+			i.AddSource(
+				$"{AttachedPropertyAttributeTypeName}.g.cs",
+				AttachedPropertyAttributeSourceText.Trim());
+		});
 
 		IncrementalValuesProvider<ClassDeclarationSyntax?> classDeclarations = context.SyntaxProvider
 			.CreateSyntaxProvider(
@@ -80,7 +90,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 				INamedTypeSymbol attributeContainingType = attributeSymbol.ContainingType;
 				string fullName = attributeContainingType.ToDisplayString();
 
-				if (fullName == AttributeTypeName)
+				if (fullName == DependencyPropertyAttributeTypeName || fullName == AttachedPropertyAttributeTypeName)
 				{
 					return fieldSyntax.Parent as ClassDeclarationSyntax;
 				}
@@ -89,18 +99,31 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 
 		return null;
 	}
-
+	
 	private void Execute(
 		Compilation compilation,
 		ImmutableArray<ClassDeclarationSyntax?> classes,
 		SourceProductionContext context)
 	{
-		INamedTypeSymbol? attributeSymbol = compilation.GetTypeByMetadataName(AttributeTypeName);
+		INamedTypeSymbol? dependencyPropertyAttributeSymbol = compilation.GetTypeByMetadataName(DependencyPropertyAttributeTypeName);
+		INamedTypeSymbol? attachedPropertyAttributeSymbol = compilation.GetTypeByMetadataName(AttachedPropertyAttributeTypeName);
 
-		if (attributeSymbol == null)
+		if (dependencyPropertyAttributeSymbol == null || attachedPropertyAttributeSymbol == null)
 		{
 			return;
 		}
+
+		FieldProcessor dependencyPropertyProcessor = new(
+			dependencyPropertyAttributeSymbol,
+			CheckDependencyProperty,
+			ProcessDependencyProperty,
+			ProcessDependencyPropertyKey);
+
+		FieldProcessor attachedPropertyProcessor = new(
+			attachedPropertyAttributeSymbol,
+			CheckAttachedProperty,
+			ProcessAttachedProperty,
+			ProcessAttachedPropertyKey);
 
 		foreach (ClassDeclarationSyntax? @class in classes.Distinct())
 		{
@@ -122,7 +145,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 			}
 
 			ImmutableArray<ISymbol> classMembers = classSymbol.GetMembers();
-			List<IFieldSymbol> fields = new();
+			List<BindableField> fields = new();
 
 			foreach (ISymbol member in classMembers)
 			{
@@ -131,18 +154,44 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 					continue;
 				}
 
-				if (!fieldSymbol.GetAttributes().Any(x => x.AttributeClass?.ToDisplayString() == AttributeTypeName))
+				bool isDependencyProperty = fieldSymbol
+					.GetAttributes()
+					.Any(x => x.AttributeClass == dependencyPropertyAttributeSymbol);
+				
+				bool isAttachedProperty = fieldSymbol
+					.GetAttributes()
+					.Any(x => x.AttributeClass == attachedPropertyAttributeSymbol);
+
+				ITypeSymbol fieldType = fieldSymbol.Type;
+
+				bool isReadWrite = fieldType.Name == DependencyPropertyName;
+
+				PropertyType propertyType = isReadWrite
+					? PropertyType.ReadWrite
+					: PropertyType.ReadOnly;
+
+				FieldProcessor? processor = null;
+
+				if (isDependencyProperty)
 				{
+					processor = dependencyPropertyProcessor;
+				}
+				else if (isAttachedProperty)
+				{
+					processor = attachedPropertyProcessor;
+				}
+
+				if (processor == null)
+				{
+					// TODO: Internal error.
 					continue;
 				}
 
-				CheckResult checkResult = IsAttachedPropertyGenerator
-					? CheckAttachedProperty(context, classSymbol, fieldSymbol, attributeSymbol)
-					: CheckDependencyProperty(context, classSymbol, fieldSymbol, attributeSymbol);
-
+				CheckResult checkResult = processor.Check(context, classSymbol, fieldSymbol);
+				
 				if (checkResult == CheckResult.Valid)
 				{
-					fields.Add(fieldSymbol);
+					fields.Add(new BindableField(fieldSymbol, processor, propertyType));
 				}
 			}
 
@@ -151,18 +200,18 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 				continue;
 			}
 
-			string? classSource = ProcessClass(classSymbol, fields, attributeSymbol);
+			string? classSource = ProcessClass(classSymbol, fields);
 
 			if (string.IsNullOrEmpty(classSource))
 			{
 				continue;
 			}
 
-			context.AddSource($"{classSymbol}_Bindables_{AttributeName}.g.cs", classSource!);
+			context.AddSource($"{classSymbol}_Bindables.g.cs", classSource!);
 		}
 	}
 	
-	private string? ProcessClass(INamedTypeSymbol classSymbol, List<IFieldSymbol> fields, ISymbol attributeSymbol)
+	private string? ProcessClass(INamedTypeSymbol classSymbol, List<BindableField> fields)
 	{
 		if (!classSymbol.ContainingSymbol.Equals(classSymbol.ContainingNamespace, SymbolEqualityComparer.Default))
 		{
@@ -191,9 +240,9 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 
 		List<string> initializationLines = new();
 
-		foreach (IFieldSymbol field in fields)
+		foreach (BindableField field in fields)
 		{
-			ProcessField(builder, classSymbol, field, attributeSymbol, initializationLines);
+			field.FieldProcessor.Process(builder, classSymbol, field, initializationLines);
 		}
 
 		builder.AppendLine($"static {classSymbol.Name}()");
@@ -215,46 +264,6 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		return builder.ToString();
 	}
 
-	private void ProcessField(
-		CodeBuilder builder,
-		INamedTypeSymbol classSymbol,
-		IFieldSymbol field,
-		ISymbol attributeSymbol,
-		List<string> initializationLines)
-	{
-		ITypeSymbol fieldType = field.Type;
-
-		bool isDependencyProperty = fieldType.Name == DependencyPropertyName;
-		bool isDependencyPropertyKey = fieldType.Name == DependencyPropertyKeyName;
-
-		if (isDependencyProperty)
-		{
-			if (IsAttachedPropertyGenerator)
-			{
-				ProcessAttachedProperty(builder, classSymbol, field, attributeSymbol, initializationLines);
-			}
-			else
-			{
-				ProcessDependencyProperty(builder, classSymbol, field, attributeSymbol, initializationLines);
-			}
-		}
-		else if (isDependencyPropertyKey)
-		{
-			if (IsAttachedPropertyGenerator)
-			{
-				ProcessAttachedPropertyKey(builder, classSymbol, field, attributeSymbol, initializationLines);
-			}
-			else
-			{
-				ProcessDependencyPropertyKey(builder, classSymbol, field, attributeSymbol, initializationLines);
-			}
-		}
-		else
-		{
-			// TODO: Internal error.
-		}
-	}
-	
 	protected void ProcessDependencyProperty(
 		CodeBuilder builder,
 		INamedTypeSymbol classSymbol,
@@ -262,8 +271,8 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		ISymbol attributeSymbol,
 		List<string> initializationLines)
 	{
-		AttributeData attributeData = field.GetAttributeData(attributeSymbol);
-		INamedTypeSymbol? propertyType = attributeData.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
+		AttributeData? attributeData = field.GetAttributeData(attributeSymbol);
+		INamedTypeSymbol? propertyType = attributeData?.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
 
 		if (propertyType == null)
 		{
@@ -349,8 +358,8 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		ISymbol attributeSymbol,
 		List<string> initializationLines)
 	{
-		AttributeData attributeData = field.GetAttributeData(attributeSymbol);
-		INamedTypeSymbol? propertyType = attributeData.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
+		AttributeData? attributeData = field.GetAttributeData(attributeSymbol);
+		INamedTypeSymbol? propertyType = attributeData?.ConstructorArguments.SingleOrDefault().Value as INamedTypeSymbol;
 
 		if (propertyType == null)
 		{
@@ -649,8 +658,8 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		INamedTypeSymbol attributeSymbol,
 		IReadOnlyList<string> parameterTypes)
 	{
-		AttributeData attributeData = fieldSymbol.GetAttributeData(attributeSymbol);
-		string? propertyChangedMethodName = attributeData.GetOnPropertyChangedMethod();
+		AttributeData? attributeData = fieldSymbol.GetAttributeData(attributeSymbol);
+		string? propertyChangedMethodName = attributeData?.GetOnPropertyChangedMethod();
 
 		if (propertyChangedMethodName == null)
 		{
@@ -711,8 +720,8 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		INamedTypeSymbol attributeSymbol,
 		IReadOnlyList<string> parameterTypes)
 	{
-		AttributeData attributeData = fieldSymbol.GetAttributeData(attributeSymbol);
-		string? coerceValueMethodName = attributeData.GetOnCoerceValueMethod();
+		AttributeData? attributeData = fieldSymbol.GetAttributeData(attributeSymbol);
+		string? coerceValueMethodName = attributeData?.GetOnCoerceValueMethod();
 
 		if (coerceValueMethodName == null)
 		{
@@ -772,8 +781,8 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		IFieldSymbol fieldSymbol,
 		INamedTypeSymbol attributeSymbol)
 	{
-		AttributeData attributeData = fieldSymbol.GetAttributeData(attributeSymbol);
-		string? defaultValueFieldName = attributeData.GetDefaultValueField();
+		AttributeData? attributeData = fieldSymbol.GetAttributeData(attributeSymbol);
+		string? defaultValueFieldName = attributeData?.GetDefaultValueField();
 
 		if (defaultValueFieldName == null)
 		{

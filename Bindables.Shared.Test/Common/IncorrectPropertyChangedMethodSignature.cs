@@ -6,20 +6,25 @@ namespace Bindables.Test;
 
 public abstract partial class TestBase<T>
 {
-	private const string IncorrectPropertyChangedMethodSignatureSourceCodeTemplate = @"
-using PlatformNamespace;
-using AttributeNamespace;
+	private readonly string IncorrectPropertyChangedMethodSignatureSourceCodeTemplate;
 
-public partial class InvalidClass : BaseClassName
-{
-	[AttributeName(typeof(int), OnPropertyChanged = nameof(PropertyChangedCallback))]
-	public static readonly PropertyType ExampleProperty;
+	public TestBase()
+	{
+		IncorrectPropertyChangedMethodSignatureSourceCodeTemplate = $@"
+using {PlatformNamespace};
+using {AttributeNamespace};
+
+public partial class InvalidClass : {BaseClassName}
+{{
+	[{DependencyPropertyAttributeName}(typeof(int), OnPropertyChanged = nameof(PropertyChangedCallback))]
+	public static readonly {DependencyPropertyName} ExampleProperty;
 
     PropertyChangedCallbackMethodSignature
-    {
+    {{
 		PropertyChangedCallbackMethodBody
-    }
-}";
+    }}
+}}";
+	}
 
 	[Test]
 	public void IncorrectPropertyChangedMethodSignatureInvalidParameters()

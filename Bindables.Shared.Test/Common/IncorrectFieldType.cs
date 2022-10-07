@@ -7,31 +7,31 @@ public abstract partial class TestBase<T>
 	[Test]
 	public void IncorrectFieldType()
 	{
-		const string sourceCodeTemplate = @"
-using PlatformNamespace;
-using AttributeNamespace;
+		string sourceCode = $@"
+using {PlatformNamespace};
+using {AttributeNamespace};
 
-public partial class InvalidClass : BaseClassName
-{
-	[AttributeName(typeof(int))]
+public partial class InvalidClass : {BaseClassName}
+{{
+	[{DependencyPropertyAttributeName}(typeof(int))]
 	public static readonly int Example;
-}";
+}}";
 
-		TestSourceCodeTemplate(sourceCodeTemplate, Diagnostics.IncorrectFieldType);
+		TestSourceCodeTemplate(sourceCode, Diagnostics.IncorrectFieldType);
 	}
 
 	[Test]
 	public void IncorrectReadOnlyFieldType()
 	{
-		const string sourceCodeTemplate = @"
-using PlatformNamespace;
-using AttributeNamespace;
+		string sourceCode = $@"
+using {PlatformNamespace};
+using {AttributeNamespace};
 
-public partial class InvalidClass : BaseClassName
-{
-	[AttributeName(typeof(int))]
+public partial class InvalidClass : {BaseClassName}
+{{
+	[{DependencyPropertyAttributeName}(typeof(int))]
 	public static readonly int Example;
-}";
-		TestSourceCodeTemplate(sourceCodeTemplate, Diagnostics.IncorrectFieldType);
+}}";
+		TestSourceCodeTemplate(sourceCode, Diagnostics.IncorrectFieldType);
 	}
 }

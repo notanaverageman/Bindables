@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using System.Windows;
+using Bindables.Windows.Test;
 using Microsoft.CodeAnalysis;
+using NUnit.Framework;
 
 namespace Bindables.Wpf.Test;
 
-public class WpfMetadataReferences
+[TestFixture]
+public class WpfPropertyTests : WindowsTests<WpfPropertyGenerator>
 {
-	public static IEnumerable<MetadataReference> Get()
+	protected override IEnumerable<MetadataReference> GetAdditionalReferences()
 	{
 		yield return MetadataReference.CreateFromFile(typeof(DependencyObject).Assembly.Location);
 		yield return MetadataReference.CreateFromFile(typeof(UIPropertyMetadata).Assembly.Location);

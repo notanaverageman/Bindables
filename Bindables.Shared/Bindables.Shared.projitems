@@ -10,9 +10,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AttributeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BindableField.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CheckResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Diagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FieldProcessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyGeneratorBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PropertyType.cs" />
   </ItemGroup>
 </Project>

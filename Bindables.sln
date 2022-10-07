@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bindables.Forms.Test", "Bin
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Bindables.Shared.Xamarin", "Bindables.Shared.Xamarin\Bindables.Shared.Xamarin.shproj", "{6B04B044-DC79-44A0-AE9D-B03BD897C015}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bindables.Maui", "Bindables.Maui\Bindables.Maui.csproj", "{00F21535-2280-403B-8FC6-5562FE355B28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bindables.Maui", "Bindables.Maui\Bindables.Maui.csproj", "{00F21535-2280-403B-8FC6-5562FE355B28}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bindables.Maui.Test", "Bindables.Maui.Test\Bindables.Maui.Test.csproj", "{809EB4A2-5880-4773-9EAD-CD39C41AA6DE}"
 EndProject
@@ -78,6 +78,7 @@ Global
 		Bindables.Shared\Bindables.Shared.projitems*{00f21535-2280-403b-8fc6-5562fe355b28}*SharedItemsImports = 5
 		Bindables.Shared.Xamarin\Bindables.Shared.Xamarin.projitems*{1d1de6c1-5c42-452b-8f95-d1dfc247b71b}*SharedItemsImports = 5
 		Bindables.Shared\Bindables.Shared.projitems*{1d1de6c1-5c42-452b-8f95-d1dfc247b71b}*SharedItemsImports = 5
+		Bindables.Shared.Test\Bindables.Shared.Test.projitems*{39c3e39c-c46d-41e0-a9d4-533d418cb244}*SharedItemsImports = 13
 		Bindables.Shared.Test.Windows\Bindables.Shared.Test.Windows.projitems*{52bd4ea5-c19a-47ab-9ae9-89b0613e4b82}*SharedItemsImports = 5
 		Bindables.Shared.Test\Bindables.Shared.Test.projitems*{52bd4ea5-c19a-47ab-9ae9-89b0613e4b82}*SharedItemsImports = 5
 		Bindables.Shared.Windows\Bindables.Shared.Windows.projitems*{56f62adb-2bb6-4a44-b43c-5f581d4d16b1}*SharedItemsImports = 5

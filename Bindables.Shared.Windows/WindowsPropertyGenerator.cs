@@ -8,6 +8,9 @@ public abstract class WindowsPropertyGenerator : PropertyGeneratorBase
 	public sealed override string DependencyPropertyName => "DependencyProperty";
 	public sealed override string DependencyPropertyKeyName => "DependencyPropertyKey";
 
+	public sealed override string DependencyPropertyAttributeName => "DependencyPropertyAttribute";
+	public sealed override string AttachedPropertyAttributeName => "AttachedPropertyAttribute";
+
 	public override string BaseClassName => "DependencyObject";
 	public override string DerivedFromBaseClassName => $"{PlatformNamespace}.Controls.Button";
 	
@@ -21,30 +24,8 @@ public abstract class WindowsPropertyGenerator : PropertyGeneratorBase
 
 	public override DiagnosticDescriptor DoesNotInheritFromBaseClassDiagnosticDescriptor => Diagnostics.ClassDoesNotInheritFromDependencyObject;
 
-	public sealed override string AttributeSourceText => $@"
-using System;
-using {PlatformNamespace};
-
-#nullable enable
-
-namespace {AttributeNamespace}
-{{
-    [AttributeUsage(AttributeTargets.Field)]
-    internal class {AttributeName} : Attribute
-    {{
-        public Type PropertyType {{ get; }}
-        public string? OnPropertyChanged {{ get; set; }}
-        public string? OnCoerceValue {{ get; set; }}
-        public string? DefaultValueField {{ get; set; }}
-        public FrameworkPropertyMetadataOptions Options {{ get; set; }}
-
-        public {AttributeName}(Type propertyType)
-        {{
-            PropertyType = propertyType;
-        }}
-    }}
-}}
-";
+	public sealed override string DependencyPropertyAttributeSourceText => GetAttributeSourceText(DependencyPropertyAttributeName);
+	public sealed override string AttachedPropertyAttributeSourceText => GetAttributeSourceText(AttachedPropertyAttributeName);
 
 	public WindowsPropertyGenerator()
 	{
@@ -61,7 +42,35 @@ namespace {AttributeNamespace}
 			"object"
 		};
 	}
-	
+
+	private string GetAttributeSourceText(string attributeName)
+	{
+		return $@"
+using System;
+using {PlatformNamespace};
+
+#nullable enable
+
+namespace {AttributeNamespace}
+{{
+    [AttributeUsage(AttributeTargets.Field)]
+    internal class {attributeName} : Attribute
+    {{
+        public Type PropertyType {{ get; }}
+        public string? OnPropertyChanged {{ get; set; }}
+        public string? OnCoerceValue {{ get; set; }}
+        public string? DefaultValueField {{ get; set; }}
+        public FrameworkPropertyMetadataOptions Options {{ get; set; }}
+
+        public {attributeName}(Type propertyType)
+        {{
+            PropertyType = propertyType;
+        }}
+    }}
+}}
+";
+	}
+
 	protected override IReadOnlyList<string> GetAdditionalParameters(AttributeData attributeData)
 	{
 		string? propertyChangedMethod = attributeData.GetOnPropertyChangedMethod();
