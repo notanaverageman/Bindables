@@ -20,6 +20,8 @@ public abstract partial class TestBase<T> where T : PropertyGeneratorBase, new()
 	public string AttachedPropertyAttributeName => Generator.AttachedPropertyAttributeName;
 	public string BaseClassName => Generator.BaseClassName;
 	public string DerivedFromBaseClassName => Generator.DerivedFromBaseClassName;
+	public string GeneratorName => Generator.GeneratorName;
+	public string GeneratorVersion => Generator.GeneratorVersion;
 	public string DependencyPropertyName => Generator.DependencyPropertyName;
 	public string DependencyPropertyKeyName => Generator.DependencyPropertyKeyName;
 	public IReadOnlyList<string> PropertyChangedMethodParameterTypes => Generator.PropertyChangedMethodParameterTypes;

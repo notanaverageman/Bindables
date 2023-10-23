@@ -21,6 +21,8 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 	public abstract string RegisterReadOnlyMethod { get; }
 	public abstract string RegisterAttachedMethod { get; }
 	public abstract string RegisterAttachedReadOnlyMethod { get; }
+	public abstract string GeneratorName { get; }
+	public abstract string GeneratorVersion { get; }
 
 	public abstract IReadOnlyList<string> PropertyChangedMethodParameterTypes { get; }
 	public abstract IReadOnlyList<string> CoerceValueMethodParameterTypes { get; }
@@ -245,6 +247,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 			field.FieldProcessor.Process(builder, classSymbol, field, initializationLines);
 		}
 
+		builder.AppendLine($"[global::System.CodeDom.Compiler.GeneratedCode(\"{GeneratorName}\", \"{GeneratorVersion}\")]");
 		builder.AppendLine($"static {classSymbol.Name}()");
 		builder.OpenScope();
 
@@ -328,6 +331,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		string maybeNullPropertyTypeName = propertyType.ToDisplayString(NullableFlowState.MaybeNull);
 		string propertyTypeName = propertyType.ToDisplayString();
 
+		builder.AppendLine($"[global::System.CodeDom.Compiler.GeneratedCode(\"{GeneratorName}\", \"{GeneratorVersion}\")]");
 		builder.AppendLine($"public static readonly {DependencyPropertyName} {propertyName}Property;");
 		builder.AppendLine();
 
@@ -410,6 +414,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		string maybeNullPropertyTypeName = propertyType.ToDisplayString(NullableFlowState.MaybeNull);
 		string propertyTypeName = propertyType.ToDisplayString();
 
+		builder.AppendLine($"[global::System.CodeDom.Compiler.GeneratedCode(\"{GeneratorName}\", \"{GeneratorVersion}\")]");
 		builder.AppendLine($"public static readonly {DependencyPropertyName} {propertyName}Property;");
 		builder.AppendLine();
 
@@ -442,6 +447,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		// Do not append visibility if it is public.
 		fieldVisibility = fieldVisibility.Replace("public", "");
 
+		builder.AppendLine($"[global::System.CodeDom.Compiler.GeneratedCode(\"{GeneratorName}\", \"{GeneratorVersion}\")]");
 		builder.AppendLine($"public {propertyTypeName} {propertyName}");
 		builder.OpenScope();
 
@@ -486,6 +492,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		string propertyName,
 		string fieldVisibility)
 	{
+		builder.AppendLine($"[global::System.CodeDom.Compiler.GeneratedCode(\"{GeneratorName}\", \"{GeneratorVersion}\")]");
 		builder.AppendLine($"public static {propertyTypeName} Get{propertyName}({BaseClassName} target)");
 		builder.OpenScope();
 
@@ -494,6 +501,7 @@ public abstract class PropertyGeneratorBase : IIncrementalGenerator
 		builder.CloseScope();
 		builder.AppendLine();
 
+		builder.AppendLine($"[global::System.CodeDom.Compiler.GeneratedCode(\"{GeneratorName}\", \"{GeneratorVersion}\")]");
 		builder.AppendLine($"{fieldVisibility} static void Set{propertyName}({BaseClassName} target, {propertyTypeName} value)");
 		builder.OpenScope();
 

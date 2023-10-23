@@ -73,102 +73,121 @@ using {PlatformNamespace};
 
 public partial class ExampleClass
 {{
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public int Example1
     {{
         get => (int)GetValue(Example1Property);
         set => SetValue(Example1Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public int Example2
     {{
         get => (int)GetValue(Example2Property);
         set => SetValue(Example2Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public string? Example3
     {{
         get => (string?)GetValue(Example3Property);
         set => SetValue(Example3Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public string? Example4
     {{
         get => (string?)GetValue(Example4Property);
         set => SetValue(Example4Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public string? Example5
     {{
         get => (string?)GetValue(Example5Property);
         set => SetValue(Example5Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public string? Example6
     {{
         get => (string?)GetValue(Example6Property);
         set => SetValue(Example6Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static int GetExampleAttached1({BaseClassName} target)
     {{
         return (int)target.GetValue(ExampleAttached1Property);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static void SetExampleAttached1({BaseClassName} target, int value)
     {{
         target.SetValue(ExampleAttached1Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static int GetExampleAttached2({BaseClassName} target)
     {{
         return (int)target.GetValue(ExampleAttached2Property);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static void SetExampleAttached2({BaseClassName} target, int value)
     {{
         target.SetValue(ExampleAttached2Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static string? GetExampleAttached3({BaseClassName} target)
     {{
         return (string?)target.GetValue(ExampleAttached3Property);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static void SetExampleAttached3({BaseClassName} target, string? value)
     {{
         target.SetValue(ExampleAttached3Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static string? GetExampleAttached4({BaseClassName} target)
     {{
         return (string?)target.GetValue(ExampleAttached4Property);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static void SetExampleAttached4({BaseClassName} target, string? value)
     {{
         target.SetValue(ExampleAttached4Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static string? GetExampleAttached5({BaseClassName} target)
     {{
         return (string?)target.GetValue(ExampleAttached5Property);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static void SetExampleAttached5({BaseClassName} target, string? value)
     {{
         target.SetValue(ExampleAttached5Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static string? GetExampleAttached6({BaseClassName} target)
     {{
         return (string?)target.GetValue(ExampleAttached6Property);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     public static void SetExampleAttached6({BaseClassName} target, string? value)
     {{
         target.SetValue(ExampleAttached6Property, value);
     }}
 
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     static ExampleClass()
     {{
         Example1Property = {DependencyPropertyName}.Create(

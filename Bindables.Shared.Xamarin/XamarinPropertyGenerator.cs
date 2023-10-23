@@ -54,6 +54,7 @@ using {PlatformNamespace};
 
 namespace {AttributeNamespace}
 {{
+    [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
     [AttributeUsage(AttributeTargets.Field)]
     internal class {attributeName} : Attribute
     {{
