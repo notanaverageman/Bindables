@@ -94,26 +94,31 @@ using System.Windows;
 
 public partial class YourClass
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Bindables.Wpf.WpfPropertyGenerator", "1.4.0")]
     public string? Regular
     {
         get => (string?)GetValue(RegularProperty);
         set => SetValue(RegularProperty, value);
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Bindables.Wpf.WpfPropertyGenerator", "1.4.0")]
     public static readonly DependencyProperty ReadOnlyProperty;
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Bindables.Wpf.WpfPropertyGenerator", "1.4.0")]
     public string? ReadOnly
     {
         get => (string?)GetValue(ReadOnlyProperty);
         private set => SetValue(ReadOnlyPropertyKey, value);
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Bindables.Wpf.WpfPropertyGenerator", "1.4.0")]
     public string? Customized
     {
         get => (string?)GetValue(CustomizedProperty);
         set => SetValue(CustomizedProperty, value);
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Bindables.Wpf.WpfPropertyGenerator", "1.4.0")]
     static YourClass()
     {
         RegularProperty = DependencyProperty.Register(

@@ -40,46 +40,57 @@ namespace Test
 {{
     public partial class ExampleClass
     {{
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         public static readonly {DependencyPropertyName} Example1Property;
 
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         public int Example1
         {{
             get => (int)GetValue(Example1Property);
             private set => SetValue(Example1PropertyKey, value);
         }}
 
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         public static readonly {DependencyPropertyName} Example2Property;
 
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         public string? Example2
         {{
             get => (string?)GetValue(Example2Property);
             private set => SetValue(Example2PropertyKey, value);
         }}
 
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         public static readonly {DependencyPropertyName} Example3Property;
 
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         public static int GetExample3({BaseClassName} target)
         {{
             return (int)target.GetValue(Example3Property);
         }}
 
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         private static void SetExample3({BaseClassName} target, int value)
         {{
             target.SetValue(Example3Property, value);
         }}
 
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         public static readonly {DependencyPropertyName} Example4Property;
 
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         public static string? GetExample4({BaseClassName} target)
         {{
             return (string?)target.GetValue(Example4Property);
         }}
 
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         private static void SetExample4({BaseClassName} target, string? value)
         {{
             target.SetValue(Example4Property, value);
         }}
 
+        [global::System.CodeDom.Compiler.GeneratedCode(""{GeneratorName}"", ""{GeneratorVersion}"")]
         static ExampleClass()
         {{
             Example1PropertyKey = {DependencyPropertyName}.CreateReadOnly(
